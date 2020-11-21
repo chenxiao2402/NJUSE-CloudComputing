@@ -1,0 +1,63 @@
+{
+  "name": "sparkproject",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@types/echarts": "^4.9.0",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-router": "^5.1.8",
+    "@types/react-router-dom": "^5.1.6",
+    "@vx/axis": "latest",
+    "@vx/group": "latest",
+    "@vx/scale": "latest",
+    "@vx/shape": "latest",
+    "@vx/text": "latest",
+    "antd": "^4.8.0",
+    "axios": "^0.21.0",
+    "chart-race-react": "^1.0.2",
+    "csv-parse": "^4.13.1",
+    "d3": "^6.2.0",
+    "d3-scale-chromatic": "latest",
+    "echarts": "^4.9.0",
+    "qs": "^6.9.4",
+    "raw-loader": "^4.0.2",
+    "react": "^16.9.0",
+    "react-axios": "^2.0.3",
+    "react-chart-race": "0.0.3",
+    "react-dom": "^16.9.0",
+    "react-dynamic-charts": "^1.0.5",
+    "react-papaparse": "^3.11.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.0",
+    "react-spring": "latest",
+    "react-transition-group": "^4.4.1",
+    "typescript": "^4.0.5",
+    "web-vitals": "^0.2.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
