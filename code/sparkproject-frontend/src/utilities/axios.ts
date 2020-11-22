@@ -15,15 +15,24 @@ axios.interceptors.request.use((config) => {
 
 
 const url = {
-
+    popularFields: 'PopularFields',
+    paperNumbers: 'PaperNumbers',
+    popularPapers: 'PopularPapers',
+    popularAuthors: 'PopularAuthors',
+    popularFieldRanking: 'PopularFieldRanking',
+    popularAnnualField: 'PopularAnnualField',
+    intersectionOfFields: 'IntersectionOfFields',
+    relatedFields: 'RelatedFields',
+    authorConnections: 'AuthorConnection',
+    collaborators: 'Collaborators'
 };
 
 const loadData = (url, params: any, callback: Function) => {
     axios.get(`/${url}`, params)
-        .then(function (response) {
+        .then((response) => {
             callback(response.data);
         })
-        .catch(function (error) {
+        .catch((error) => {
             console.log(error);
         });
 };

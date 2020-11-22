@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import ChartRace from './ChartRace';
 import echarts from '../../utilities/echarts';
 import {Col, Row, InputNumber, Button, Space} from 'antd';
-import { SearchOutlined, CaretRightOutlined} from '@ant-design/icons';
+import { SearchOutlined, CaretRightOutlined, UploadOutlined, LoadingOutlined} from '@ant-design/icons';
 import {getColorDict} from '../../utilities/color';
+// import {url, loadData} from "../../utilities/axios";
 
 interface IState {
     originalData: Array<any>,
@@ -12,8 +13,11 @@ interface IState {
     index: number,
     year: number,
     colorDict: {},
-    interval: Array<any>,
-    playing: boolean
+    playing: boolean,
+    playingInterval: any,
+    loadingStream: boolean
+    loadingStreamInterval: any,
+    dataNumber: number
 }
 
 class DynamicRanking extends Component<any, IState>{
@@ -26,8 +30,11 @@ class DynamicRanking extends Component<any, IState>{
             index: 0,
             year: 5,
             colorDict: {},
-            interval: [],
-            playing: false
+            playing: false,
+            playingInterval: null,
+            loadingStream: false,
+            loadingStreamInterval: null,
+            dataNumber: 0
         };
     }
 
@@ -77,10 +84,10 @@ class DynamicRanking extends Component<any, IState>{
     };
 
     yearSelected = () => {
-        for (let interval of this.state.interval) {
-            clearInterval(interval);
-        }
-        this.setState({playing: false});
+        clearInterval(this.state.playingInterval);
+        clearInterval(this.state.loadingStreamInterval);
+
+        this.setState({playing: false, loadingStream: false});
 
         const originalData = this.fakeData();
         let nameSet = new Set();
@@ -95,25 +102,27 @@ class DynamicRanking extends Component<any, IState>{
             index: 0,
             colorDict: colorDict
         }, () => {
-            this.setRankData();
+            this.setRankingData();
         });
     };
 
     startPlay = () => {
         this.setState({index: 0, playing: true});
-        const interval = setInterval(() => {
+        const playingInterval = setInterval(() => {
             if (this.state.index >= this.state.originalData.length) {
                 clearInterval();
-                this.setState({playing: false});
+                this.setState({
+                    playing: false,
+                    playingInterval: null
+                });
             } else {
                 this.loadDynamicRanking();
             }
         }, 500);
-
-        this.setState({interval: this.state.interval.concat(interval)});
+        this.setState({playingInterval: playingInterval});
     };
 
-    setRankData = () => {
+    setRankingData = () => {
         const originalData = this.state.originalData[this.state.index];
         const title = originalData.date;
         const rankData = originalData.fields.map((fieldInfo) => {
@@ -131,9 +140,24 @@ class DynamicRanking extends Component<any, IState>{
     };
 
     loadDynamicRanking = () => {
-        this.setRankData();
+        this.setRankingData();
         this.setState({
             index: this.state.index + 1
+        });
+    };
+
+    loadStream = () => {
+        const loadingStreamInterval = setInterval(() => {
+            // loadData(url.authorConnections, {}, (data) => {
+            //
+            // })
+            this.setState({
+                dataNumber: this.state.dataNumber + 500
+            })
+        }, 500);
+        this.setState({
+            loadingStream: true,
+            loadingStreamInterval: loadingStreamInterval
         });
     };
 
@@ -201,7 +225,10 @@ class DynamicRanking extends Component<any, IState>{
                         <div style={{textAlign: 'center'}} >
                             <Space>
                                 <span style={{fontSize: 20, fontWeight: 'bold', marginRight: 16}}>各领域论文数量 ({2020 - this.state.year + 1}-2020)</span>
-                                <Button shape='circle' icon={<CaretRightOutlined/>} onClick={this.startPlay} disabled={this.state.playing}/>
+                                {this.state.loadingStream ? <LoadingOutlined /> : <Button shape='circle' icon={<UploadOutlined/>} onClick={this.loadStream} />}
+                                <span style={{width: 180, display: 'inline-block', textAlign: 'left'}}>流读取论文数：{this.state.dataNumber}</span>
+                                <Button shape='circle' icon={<CaretRightOutlined/>} onClick={this.startPlay}
+                                        disabled={this.state.playing} />
                                 <span>{this.state.title}</span>
                             </Space>
                         </div>
