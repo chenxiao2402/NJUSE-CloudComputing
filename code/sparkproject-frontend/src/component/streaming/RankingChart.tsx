@@ -6,7 +6,7 @@ const defaultProps = {
     visible: false,
     width: 1000,
     onCancel: undefined,
-    data: []
+    rankingData: []
 };
 
 type Props = {} & Partial<typeof defaultProps>;
@@ -16,10 +16,10 @@ export default class RankingChart extends Component<Props, any> {
 
     draw(){
         try {
-            const maxNumber = this.props.data[0].number;
+            const maxNumber = this.props.rankingData[0].number;
             return(
                 <div>
-                    {this.props.data.map((item) => {
+                    {this.props.rankingData.map((item) => {
                         return (
                             <div>
                                 <div style={{width: '100%'}}>

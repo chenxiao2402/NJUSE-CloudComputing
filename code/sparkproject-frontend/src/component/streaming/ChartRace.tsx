@@ -27,7 +27,7 @@ export default class ChartRace extends Component<Props, States>{
     constructor(props){
         super(props);
         this.state = {
-            data: this.props.data.sort((a,b) => b.value - a.value),
+            data: this.props.data.sort((a, b) => b.value - a.value),
             temp: this.props.data,
             maxValue: Math.max.apply(Math, this.props.data.map(item => item.value))
         };

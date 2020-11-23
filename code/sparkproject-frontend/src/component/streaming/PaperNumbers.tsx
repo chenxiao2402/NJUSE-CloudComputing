@@ -5,32 +5,35 @@ import echarts from '../../utilities/echarts';
 const defaultProps = {
     visible: false,
     width: 1000,
-    onCancel: undefined
+    onCancel: undefined,
+    paperNumberData: []
 };
 
 type Props = {} & Partial<typeof defaultProps>;
 
 
-export default class PaperNumChart extends Component<Props, any> {
+export default class PaperNumbers extends Component<Props, any> {
 
     componentDidUpdate(): void {
         try {
             const myChart = echarts.init(document.getElementById('paperNumberChart'));
+            const startYear = this.props.paperNumberData[0].year;
+            const endYear = this.props.paperNumberData[this.props.paperNumberData.length - 1].year;
             myChart.setOption({
                 title: {
                     text: 'DeepLearning领域论文发表数',
-                    subtext: '2016-2020年',
+                    subtext: `${startYear}-${endYear}年`,
                     left: 'center'
                 },
                 xAxis: {
                     type: 'category',
-                    data: ['2016', '2017', '2018', '2019', '2020']
+                    data: this.props.paperNumberData.map((e) => e.year)
                 },
                 yAxis: {
                     type: 'value'
                 },
                 series: [{
-                    data: [820, 932, 901, 1290, 1330],
+                    data: this.props.paperNumberData.map((e) => e.paperNumber),
                     type: 'line'
                 }],
                 tooltip: {

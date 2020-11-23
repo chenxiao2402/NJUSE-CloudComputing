@@ -2,8 +2,8 @@ import Axios from 'axios';
 import qs from 'qs';
 
 const axios = Axios.create({
-    baseURL: "http://localhost:3333", // 这里是本地express启动的服务地址
-    timeout: 5000 // request timeout
+    baseURL: "http://localhost:8080", // 这里是本地express启动的服务地址
+    timeout: 3000 // request timeout
 });
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
 axios.interceptors.request.use((config) => {
@@ -14,11 +14,11 @@ axios.interceptors.request.use((config) => {
 });
 
 
-const url = {
-    popularFields: 'PopularFields',
-    paperNumbers: 'PaperNumbers',
-    popularPapers: 'PopularPapers',
-    popularAuthors: 'PopularAuthors',
+const URL = {
+    POPULAR_FIELDS: 'PopularFields',
+    PAPER_NUMBERS: 'PaperNumbers',
+    POPULAR_PAPERS: 'PopularPapers',
+    POPULAR_AUTHORS: 'PopularAuthors',
     popularFieldRanking: 'PopularFieldRanking',
     popularAnnualField: 'PopularAnnualField',
     intersectionOfFields: 'IntersectionOfFields',
@@ -27,8 +27,8 @@ const url = {
     collaborators: 'Collaborators'
 };
 
-const loadData = (url, params: any, callback: Function) => {
-    axios.get(`/${url}`, params)
+const sendRequest = (url, params: any, callback: Function) => {
+    axios.post(`/${url}`, params)
         .then((response) => {
             callback(response.data);
         })
@@ -37,4 +37,4 @@ const loadData = (url, params: any, callback: Function) => {
         });
 };
 
-export {url, loadData};
+export {URL, sendRequest};

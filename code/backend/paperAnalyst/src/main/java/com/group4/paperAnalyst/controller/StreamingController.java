@@ -33,7 +33,7 @@ public class StreamingController {
 
     @ApiOperation(value = "",notes="根据输⼊的年份数量，返回近x年各个领域的⽂章数和作者数，选择⽂章数量的前20名")
     @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
-    @RequestMapping(value = "/listAuthorCitations",method = RequestMethod.POST)
+    @RequestMapping(value = "/PopularFields",method = RequestMethod.POST)
     @ResponseBody
     public Set<Map<String,Object>> findPopularFields(@Param("year") Long year){
         Set<Map<String,Object>> res = new HashSet<>();
@@ -86,7 +86,7 @@ public class StreamingController {
         for(Object[] o:list_paper){
             Map<String,Object> sub_res = new HashMap<>();
             sub_res.put("year",Integer.valueOf(o[0].toString()));
-            sub_res.put("paperNum",Integer.valueOf(o[1].toString()));
+            sub_res.put("paperNumber",Integer.valueOf(o[1].toString()));
             res.add(sub_res);
         }
         return res;
@@ -121,7 +121,7 @@ public class StreamingController {
         List<Object[]> list_paper= authorCitationsDAO.getAuthorByYearField(year, field);
         for(Object[] o:list_paper){
             Map<String,Object> sub_res = new HashMap<>();
-            sub_res.put("paper",o[0].toString());
+            sub_res.put("author",o[0].toString());
             sub_res.put("citation",Integer.valueOf(o[1].toString()));
             res.add(sub_res);
         }
@@ -152,7 +152,7 @@ public class StreamingController {
 
     @ApiOperation(value = "",notes="根据输⼊的年份数量，返回近x年来每⼀年的热⻔领域（按照⽂章数）和该领域的⽂章数")
     @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
-    @RequestMapping(value = "//PopularFieldRanking",method = RequestMethod.POST)
+    @RequestMapping(value = "/PopularFieldRanking",method = RequestMethod.POST)
     @ResponseBody
     public Map<String,Object> findPopularFieldRanking(@Param("year") Long year) {
         Map<String, Object> res = new HashMap<>();
