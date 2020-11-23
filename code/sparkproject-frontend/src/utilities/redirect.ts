@@ -2,7 +2,7 @@ import routes from './routes';
 
 const redirectURL = () => {
     const urls = [routes.home, routes.streaming];
-    const targets = [routes.topFieldOfYear, routes.topFieldOfYear];
+    const targets = [routes.popularFields, routes.popularFields];
     const index = urls.indexOf(window.location.pathname);
     if (index >= 0) {
         window.location.href = targets[index];

@@ -4,7 +4,6 @@ import echarts from '../../utilities/echarts';
 import {Col, Row, InputNumber, Button, Space} from 'antd';
 import { SearchOutlined, CaretRightOutlined, UploadOutlined, LoadingOutlined} from '@ant-design/icons';
 import {getColorDict} from '../../utilities/color';
-// import {url, loadData} from "../../utilities/axios";
 
 interface IState {
     originalData: Array<any>,
@@ -20,7 +19,7 @@ interface IState {
     dataNumber: number
 }
 
-class DynamicRanking extends Component<any, IState>{
+class PopularFieldRanking extends Component<any, IState>{
     constructor(props: any){
         super(props);
         this.state = {
@@ -28,7 +27,7 @@ class DynamicRanking extends Component<any, IState>{
             rankData: [],
             title: '',
             index: 0,
-            year: 5,
+            year: 2016,
             colorDict: {},
             playing: false,
             playingInterval: null,
@@ -148,9 +147,6 @@ class DynamicRanking extends Component<any, IState>{
 
     loadStream = () => {
         const loadingStreamInterval = setInterval(() => {
-            // loadData(url.authorConnections, {}, (data) => {
-            //
-            // })
             this.setState({
                 dataNumber: this.state.dataNumber + 500
             })
@@ -216,15 +212,15 @@ class DynamicRanking extends Component<any, IState>{
         return(
             <div>
                 <Space style={{marginLeft: 16, marginTop: 16, marginBottom: 32}}>
-                    <span>统计年份数</span>
-                    <InputNumber min={5} max={50} defaultValue={5} onChange={(year) => {this.setState({year: Number(year)})}} />
+                    <span>起始年份</span>
+                    <InputNumber min={2010} max={2016} defaultValue={2016} onChange={(year) => {this.setState({year: Number(year)})}} />
                     <Button shape='circle' icon={<SearchOutlined/>} type='primary' onClick={this.yearSelected}/>
                 </Space>
                 <Row gutter={120}>
                     <Col span={13}>
                         <div style={{textAlign: 'center'}} >
                             <Space>
-                                <span style={{fontSize: 20, fontWeight: 'bold', marginRight: 16}}>各领域论文数量 ({2020 - this.state.year + 1}-2020)</span>
+                                <span style={{fontSize: 20, fontWeight: 'bold', marginRight: 16}}>各领域论文数量 ({this.state.year}-2020)</span>
                                 {this.state.loadingStream ? <LoadingOutlined /> : <Button shape='circle' icon={<UploadOutlined/>} onClick={this.loadStream} />}
                                 <span style={{width: 180, display: 'inline-block', textAlign: 'left'}}>流读取论文数：{this.state.dataNumber}</span>
                                 <Button shape='circle' icon={<CaretRightOutlined/>} onClick={this.startPlay}
@@ -252,4 +248,4 @@ class DynamicRanking extends Component<any, IState>{
     }
 }
 
-export default DynamicRanking;
+export default PopularFieldRanking;
