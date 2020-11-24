@@ -107,7 +107,16 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 
 ## III. 流计算部分
 
+### 环境依赖
+
+- Spark  3.0.1 + Hadoop  3.2
+  - 总共四台云主机：一台 master + 三台 slaves
+- Scala  2.12.12
+- Mysql  8.0.22
+
 ### 配置 Spark 相关参数
+
+（我们在编写流的过程中总共编写了三个流，为了方便展示，我们将其中一个流分离了出来，与另外两个流分开启动和运行，所以在配置时需要分别配置数据存放的路径）
 
 1. 打开 `CCStreaming/src/main/scala/cc/Main.scala` 文件，配置以下 Spark 参数
    - `SPARK_MASTER_ADDRESS`：目标 master 地址
@@ -119,6 +128,9 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
    - `JDBC_URL`：数据库地址
    - `USER`：数据库用户
    - `PASSWORD`：数据库密码
+3. 使用 sql scripts 创建数据库表（两份文件均需要用数据库执行）
+   - `CCStreaming/scripts/create_table.sql ` 
+   - `CCStreaming/scripts/create_paper_count_table.sql`
 
 ### 打包项目
 
@@ -128,3 +140,37 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 4. 打包完成后可在 `CCStreaming/target/scala-2.12` 中找到已经打包好的 `jar` 文件。
 
 ### 运行
+
+1. 使用命令 `spark-submit --main cc.Main ccstreaming-assembly-0.1.jar streamName` 启动流
+   - `ccstreaming-assembly-0.1.jar`：在上一步中打包好的 jar 包路径。
+   - `streamName`：流的名称，可选 `paperCount` 和 `otherTwo` ，必须在命令行中输入要启动的流的名称，否则将直接推出 Spark。
+2. 流启动后，如果在监听的文件夹下有未处理的数据，则将开始处理，可以打开数据库，通过以下数据表查看结果（可能需要等待几分钟）：
+   - `author_citations`
+   - `paper_citations`
+   - `subject_paper_count`
+3. 可以使用我们准备好的数据集 `CCProjectSpider/data.json` 以及使用命令 `hdfs dfs -put data.json target_dir` 将数据传递到监听的文件夹下。（如果传递数据时还未启动，则可以直接将数据传递到目标文件夹，**如果流已经启动，则需要先传递到 hdfs 的另外任意一个文件夹，然后再把数据文件移动到监听的文件夹下**，这样做是为了保证数据出现时是原子性的，确保流能够处理数据文件中所有的数据 ）
+4. 重复启动流之前，需要先删除 checkpoint 文件夹中的数据，否则流不会重新处理已经处理过的文件。
+
+### 一键启动流
+
+在校园网下，访问 `172.19.241.172` ，然后点击前端页面的启动流按钮即可启动流。（需要等到几分钟，因为脚本文件需要将数据移动到监听文件夹中，并删除 checkpoint 信息后再启动 spark）
+
+- 访问 `172.19.241.172:4040` 查看任务执行状态。
+
+- 访问 `172.19.241.172:8080` ，通过界面操作 kill 流的进程。
+
+- 访问数据库 `172.19.241.172:3306 cc_data` ，查看 `subject_paper_count` 表，即可查看计算结果。
+
+- 在原始代码中我们编写了三个流，对应三张数据库表，但是只准备了一个流供前端一键启动，原因是该流的处理速度较另外两个更快，可以更快看到反馈，更利于展示。
+
+- **请不要重复启动，在重新启动下一个流之前，请务必 kill 上一个正在运行的流。**
+
+- 如果需要启动另外两个流，可以使用 ssh 访问云主机 `hadoop@172.19.241.172`（密码是 123456），并执行以下命令即可启动。同样是在 `172.19.241.172:4040` 查看任务状态，可以在部署在云端的数据库 `cc_data`的  `author_citations`  和`paper_citations` 数据表中查看结果。
+
+  ```bash
+  cd ~/scripts
+  ./scripts/start-stream-other.sh
+  ```
+
+  
+
