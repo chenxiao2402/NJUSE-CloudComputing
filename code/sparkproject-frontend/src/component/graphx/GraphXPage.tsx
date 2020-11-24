@@ -12,6 +12,7 @@ interface IState {
     field: string,
     year: number,
     selectedYear: number,
+    searchButtonDisabled: boolean,
     showRelatedFields: boolean,
     showAuthorConnection: boolean,
     author: String
@@ -23,6 +24,7 @@ class GraphXPage extends React.Component<any, IState> {
         this.state = {
             columns: [], intersectionData: [],
             field: '', year: 2016, selectedYear: 2016,
+            searchButtonDisabled: false,
             showRelatedFields: false,
             showAuthorConnection: false,
             author: ''
@@ -30,25 +32,26 @@ class GraphXPage extends React.Component<any, IState> {
     }
 
     loadTable() {
-        this.setState({selectedYear: this.state.year});
-
-        sendRequest(URL.INTERSECTION_OF_FIELDS, {year: this.state.selectedYear}, (intersectionData) => {
-            const columns = [
-                { title: '所属领域', dataIndex: 'field', key: 'field' },
-                { title: '文章数量', dataIndex: 'paperNumber', key: 'paperNumber' },
-                { title: '作者数量', dataIndex: 'authorNumber', key: 'authorNumber'},
-                { title: '信息查看', key: 'action',
-                    render: (text, record) => (
-                        <Space>
-                            <Button type='link' size='small' onClick={() => this.loadChart(record.field, 'showRelatedFields')}>相关领域</Button>
-                            <Button type='link' size='small' onClick={() => this.loadChart(record.field, 'showAuthorConnection')}>合作关系</Button>
-                        </Space>
-                    )
-                }
-            ];
-            this.setState({
-                columns: columns,
-                intersectionData: intersectionData
+        this.setState({selectedYear: this.state.year, searchButtonDisabled: true}, () => {
+            sendRequest(URL.INTERSECTION_OF_FIELDS, {year: this.state.selectedYear}, (intersectionData) => {
+                const columns = [
+                    { title: '所属领域', dataIndex: 'field', key: 'field' },
+                    { title: '文章数量', dataIndex: 'paperNumber', key: 'paperNumber' },
+                    { title: '作者数量', dataIndex: 'authorNumber', key: 'authorNumber'},
+                    { title: '信息查看', key: 'action',
+                        render: (text, record) => (
+                            <Space>
+                                <Button type='link' size='small' onClick={() => this.loadChart(record.field, 'showRelatedFields')}>相关领域</Button>
+                                <Button type='link' size='small' onClick={() => this.loadChart(record.field, 'showAuthorConnection')}>合作关系</Button>
+                            </Space>
+                        )
+                    }
+                ];
+                this.setState({
+                    columns: columns,
+                    intersectionData: intersectionData,
+                    searchButtonDisabled: false
+                });
             });
         });
     }
@@ -75,7 +78,7 @@ class GraphXPage extends React.Component<any, IState> {
                 <Space style={{marginBottom: 16}}>
                     <span>起始年份</span>
                     <InputNumber min={2010} max={2016} defaultValue={2016} onChange={(year) => {this.setState({year: Number(year)})}} />
-                    <Button shape='circle' icon={<SearchOutlined/>} type='primary' onClick={this.yearSelected}/>
+                    <Button shape='circle' icon={<SearchOutlined/>} type='primary' onClick={this.yearSelected} disabled={this.state.searchButtonDisabled}/>
                 </Space>
                 <Row gutter={0}>
                     <Col span={14}>
