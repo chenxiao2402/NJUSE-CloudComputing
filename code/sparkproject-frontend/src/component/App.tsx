@@ -2,7 +2,7 @@ import React, {FC, lazy, Suspense} from 'react';
 import {Layout, Menu} from 'antd';
 import '../style/App.css';
 import {Route, Switch} from 'react-router-dom';
-import routes from '../utilities/routes';
+import ROUTES from '../utilities/routes';
 import {redirectURL, getSubject} from '../utilities/redirect';
 
 const { Header, Content} = Layout;
@@ -20,8 +20,8 @@ const App: FC = () => {
         <Layout className='content-layout'>
             <Header className='header'>
                 <Menu theme='dark' mode='horizontal' defaultSelectedKeys={[getSubject()]} onClick={clickMenu}>
-                    <Menu.Item key={routes.streaming}>Streaming</Menu.Item>
-                    <Menu.Item key={routes.graphX}>GraphX</Menu.Item>
+                    <Menu.Item key={ROUTES.STREAMING}>Streaming</Menu.Item>
+                    <Menu.Item key={ROUTES.GRAPHX}>GraphX</Menu.Item>
                 </Menu>
             </Header>
             <Layout className='content-layout'>
@@ -29,8 +29,8 @@ const App: FC = () => {
                     <Content className='site-layout-background' style={{padding: 32, margin: 0, minHeight: 280}}>
                         <Suspense fallback={<div>Loading...</div>}>
                             <Switch>
-                                <Route path={routes.streaming} component={StreamingPage}/>
-                                <Route path={routes.graphX} component={GraphXPage}/>
+                                <Route path={ROUTES.STREAMING} component={StreamingPage}/>
+                                <Route path={ROUTES.GRAPHX} component={GraphXPage}/>
                             </Switch>
                         </Suspense>
                     </Content>

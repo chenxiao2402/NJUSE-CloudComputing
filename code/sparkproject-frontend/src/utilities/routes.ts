@@ -5,13 +5,13 @@ const dynamicRanking = streaming + '/PopularFieldRanking';
 
 const graphX = '/GraphX';
 
-const routes = {
-    home: '/',
-    streaming: streaming,
-    graphX: graphX,
-    topAuthorOfField: topAuthorOfField,
-    popularFields: popularFields,
-    dynamicRanking: dynamicRanking
+const ROUTES = {
+    HOME: '/',
+    STREAMING: streaming,
+    GRAPHX: graphX,
+    TOP_AUTHOR_OF_FIELD: topAuthorOfField,
+    POPULAR_FIELDS: popularFields,
+    DYNAMIC_RANKING: dynamicRanking
 };
 
-export default routes;
+export default ROUTES;

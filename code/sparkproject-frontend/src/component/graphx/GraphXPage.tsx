@@ -3,6 +3,7 @@ import {Table, Row, Col, Button, Space, InputNumber} from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import RelatedFieldsChart from './RelatedFieldsChart';
 import AuthorConnectionChart from './AuthorConnectionChart';
+import {sendRequest, URL} from "../../utilities/axios";
 
 
 interface IState {
@@ -10,6 +11,7 @@ interface IState {
     dataSource: Array<any>,
     field: string,
     year: number,
+    selectedYear: number,
     showRelatedFields: boolean,
     showAuthorConnection: boolean,
     author: String
@@ -20,7 +22,7 @@ class GraphXPage extends React.Component<any, IState> {
         super(props);
         this.state = {
             columns: [], dataSource: [],
-            field: '', year: 5,
+            field: '', year: 2016, selectedYear: 2016,
             showRelatedFields: false,
             showAuthorConnection: false,
             author: ''
@@ -28,6 +30,12 @@ class GraphXPage extends React.Component<any, IState> {
     }
 
     loadTable() {
+        this.setState({selectedYear: this.state.year});
+
+        sendRequest(URL.INTERSECTION_OF_FIELDS, {year: 2020 - this.state.selectedYear}, (originalData) => {
+            console.log(originalData);
+        });
+
         const columns = [
             {
                 title: '所属领域',
@@ -169,8 +177,8 @@ class GraphXPage extends React.Component<any, IState> {
         return (
             <div>
                 <Space style={{marginBottom: 16}}>
-                    <span>统计年份数</span>
-                    <InputNumber min={5} max={50} defaultValue={5} onChange={(year) => {this.setState({year: Number(year)})}} />
+                    <span>起始年份</span>
+                    <InputNumber min={2010} max={2016} defaultValue={2016} onChange={(year) => {this.setState({year: Number(year)})}} />
                     <Button shape='circle' icon={<SearchOutlined/>} type='primary' onClick={this.yearSelected}/>
                 </Space>
                 <Row gutter={0}>
@@ -183,8 +191,8 @@ class GraphXPage extends React.Component<any, IState> {
                     </Col>
                     <Col span={10}>
                         <div style={{width: '100%', height: '100%', marginTop: 24}}>
-                            <RelatedFieldsChart visible={this.state.showRelatedFields} field={this.state.field} year={this.state.year}/>
-                            <AuthorConnectionChart visible={this.state.showAuthorConnection} field={this.state.field} year={this.state.year}/>
+                            <RelatedFieldsChart visible={this.state.showRelatedFields} field={this.state.field} year={this.state.selectedYear}/>
+                            <AuthorConnectionChart visible={this.state.showAuthorConnection} field={this.state.field} year={this.state.selectedYear}/>
                         </div>
                     </Col>
                 </Row>

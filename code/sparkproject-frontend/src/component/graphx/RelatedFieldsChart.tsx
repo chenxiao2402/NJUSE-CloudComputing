@@ -4,7 +4,7 @@ import echarts from '../../utilities/echarts';
 const defaultProps = {
     visible: false,
     field: 'Machine Learning',
-    year: 5
+    year: 2016
 };
 
 type Props = {} & Partial<typeof defaultProps>;
@@ -33,7 +33,7 @@ export default class RelatedFieldsChart extends Component<Props, any> {
             const data = this.fakeData();
             var option = {
                 title: {
-                    text:  `${this.props.field}相关领域（2016-2020）`,
+                    text:  `${this.props.field}相关领域（${this.props.year}-2020）`,
                     left: 'center'
                 },
                 grid: {

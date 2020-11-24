@@ -1,8 +1,8 @@
-import routes from './routes';
+import ROUTES from './routes';
 
 const redirectURL = () => {
-    const urls = [routes.home, routes.streaming];
-    const targets = [routes.popularFields, routes.popularFields];
+    const urls = [ROUTES.HOME, ROUTES.STREAMING];
+    const targets = [ROUTES.POPULAR_FIELDS, ROUTES.POPULAR_FIELDS];
     const index = urls.indexOf(window.location.pathname);
     if (index >= 0) {
         window.location.href = targets[index];
