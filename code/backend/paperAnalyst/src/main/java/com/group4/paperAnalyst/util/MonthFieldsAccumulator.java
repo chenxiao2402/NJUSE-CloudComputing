@@ -2,7 +2,6 @@ package com.group4.paperAnalyst.util;
 
 import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
