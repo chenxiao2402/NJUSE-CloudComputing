@@ -48,5 +48,9 @@ def process_file(file_name):
     data = data.drop(columns=['abstract', 'url'])
     data = data[data['subjects'].str.len() > 0]
 
-    data.to_json(r'..\json\{}.json'.format(file_name[:-4]), orient='records')
+    # insure the types of year and month are 'int64'
+    data['year'] = data['year'].astype('int64')
+    data['month'] = data['month'].astype('int64')
+
+    data.to_json(r'../json/{}.json'.format(file_name[3:-4]), orient='records')
     return data

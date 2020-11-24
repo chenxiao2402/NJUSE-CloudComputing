@@ -59,20 +59,6 @@ public class StreamingController {
     @ResponseBody
     public List<YearSubjectPaperCountVO> findPaperNumbers(@Param("year") Long year, @Param("field") String field) {
         return subjectPaperCountDAO.getSubjectYearTrend(year, field);
-//        List<Map<String, Object>> res = new LinkedList<>();
-//        List<Object[]> list_paper = paperCitationsDAO.getPapernumByYearField(year, field);
-//        Map<Integer, Integer> mapForSort = new HashMap<>();
-//        for (Object[] o : list_paper) {
-//            mapForSort.put(Integer.valueOf(o[0].toString()), Integer.valueOf(o[1].toString()));
-//        }
-//        Map<Integer, Integer> mapSorted = MapSortUtil.sortByKeyAsc(mapForSort);
-//        for (Integer sortedYear : mapSorted.keySet()) {
-//            Map<String, Object> sub_res = new HashMap<>();
-//            sub_res.put("year", sortedYear);
-//            sub_res.put("paperNumber", mapSorted.get(sortedYear));
-//            res.add(sub_res);
-//        }
-//        return res;
     }
 
     @ApiOperation(value = "", notes = "根据输⼊的年份数量和领域，返回近x年该领域⾼引⽤⽂章前10名")

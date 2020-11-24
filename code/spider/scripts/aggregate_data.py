@@ -3,7 +3,7 @@ import pandas as pd
 from scripts.csv_converter import process_file
 from scripts.process_arxiv_dataset import process_arxiv
 
-file_list = [r'..\acm_{}.csv'.format(i) for i in range(2009, 2021)]
+file_list = [r'..\acm_{}.csv'.format(i) for i in range(2005, 2021)]
 processed_data = []
 for file in file_list:
     processed_data.append(process_file(file))
