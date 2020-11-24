@@ -32,7 +32,7 @@ class GraphXPage extends React.Component<any, IState> {
     loadTable() {
         this.setState({selectedYear: this.state.year});
 
-        sendRequest(URL.INTERSECTION_OF_FIELDS, {year: 2020 - this.state.selectedYear}, (originalData) => {
+        sendRequest(URL.INTERSECTION_OF_FIELDS, {year: this.state.selectedYear}, (originalData) => {
             console.log(originalData);
         });
 

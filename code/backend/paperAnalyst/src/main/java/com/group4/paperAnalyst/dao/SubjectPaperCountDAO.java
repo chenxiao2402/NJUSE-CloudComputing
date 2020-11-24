@@ -26,7 +26,7 @@ public interface SubjectPaperCountDAO extends JpaRepository<SubjectPaperCount,In
     @Transactional
     @Modifying
     @Query(value = "select subject,paper_count,author_count from subject_paper_count where subject = :subject and "
-            +"year >= Year(CURDATE())-:year",nativeQuery = true)
+            +"year >= :year",nativeQuery = true)
     List<Object[]> getCountByYearSubject(@Param("year") Long year, @Param("subject") String subject);
 
 }

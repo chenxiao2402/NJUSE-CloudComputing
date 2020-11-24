@@ -17,6 +17,6 @@ public interface SubjectCrossoverRankDAO extends JpaRepository<SubjectCrossoverR
     @Modifying
     //选择近几年交叉领域前十名
     @Query(value = "select * from subject_crossover_rank  where start_year >= "+
-            "Year(CURDATE())-:year order by crossover_rank desc limit 20",nativeQuery = true)
+            ":year order by crossover_rank desc limit 20",nativeQuery = true)
     List<SubjectCrossoverRank> getRelatedFields(@Param("year") Long year);
 }

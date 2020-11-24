@@ -14,6 +14,6 @@ public interface CollaborationDAO extends JpaRepository<Collaborations,Integer> 
     @Modifying
     //
     @Query(value = "select * from collaborations  where start_year >="+
-            "Year(CURDATE())-:year and subject = :field",nativeQuery = true)
+            ":year and subject = :field",nativeQuery = true)
     List<Collaborations> getRelatedFields(@Param("year") Long year,@Param("field")String field);
 }
