@@ -42,7 +42,7 @@ class PopularFieldRanking extends Component<any, IState>{
         clearInterval(this.state.playingInterval);
         this.setState({selectedYear: this.state.year});
 
-        sendRequest(URL.POPULAR_FIELD_RANKING, {year: 2020 - this.state.selectedYear}, (originalData) => {
+        sendRequest(URL.POPULAR_FIELD_RANKING, {year: this.state.selectedYear}, (originalData) => {
             let nameSet = new Set();
             originalData.fields.forEach((field) => { nameSet.add(field); });
             const colorDict = getColorDict(nameSet);
@@ -54,7 +54,7 @@ class PopularFieldRanking extends Component<any, IState>{
             }, this.setRankingData);
         });
 
-        sendRequest(URL.POPULAR_ANNUAL_FIELD, {year: 2020 - this.state.selectedYear}, (annualData) => {
+        sendRequest(URL.POPULAR_ANNUAL_FIELD, {year: this.state.selectedYear}, (annualData) => {
             this.setState({
                 annualData: annualData
             });
