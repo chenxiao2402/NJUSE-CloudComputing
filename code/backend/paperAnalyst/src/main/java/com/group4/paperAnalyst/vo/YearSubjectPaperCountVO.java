@@ -1,6 +1,6 @@
 package com.group4.paperAnalyst.vo;
 
-public class AnnualFieldVO {
+public class YearSubjectPaperCountVO {
 
     private Long year;
 
@@ -8,7 +8,7 @@ public class AnnualFieldVO {
 
     private Long count;
 
-    public AnnualFieldVO(Long year, String field, Long count) {
+    public YearSubjectPaperCountVO(Long year, String field, Long count) {
         this.year = year;
         this.field = field;
         this.count = count;

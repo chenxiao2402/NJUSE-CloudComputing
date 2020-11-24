@@ -71,9 +71,9 @@ scrapy 2.4.0
 pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话则需要安装)
 ```
 
-安装有依赖完毕后，打开`CCProject/ccspider/settings.py` ，可以对 Scrapy 的参数进行设置，如果需要使用 Mysql 作为输出，请取消第 72 行代码的注释，并对 25 - 28 行的关于 Mysql 的配置进行修改。（该步骤可跳过）
+安装有依赖完毕后，打开`code/spider/ccspider/settings.py` ，可以对 Scrapy 的参数进行设置，如果需要使用 Mysql 作为输出，请取消第 72 行代码的注释，并对 25 - 28 行的关于 Mysql 的配置进行修改。（该步骤可跳过）
 
-上述步骤完成后，进入到 `CCProjectSpider` 目录下，使用以下命令即可启动爬虫
+上述步骤完成后，进入到 `code/spider` 目录下，使用以下命令即可启动爬虫（可能需要将当前目录添加到 PYTHON_PATH 环境变量中）
 
 - 启动 ACM 爬虫
 
@@ -92,18 +92,24 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 - 启动 Arxiv 爬虫
 
     ```shell
-    scrapy crawl arxiv -o arxiv.csv
+    scrapy crawl arxiv -o arxiv.json
     ```
 
 ### 数据预处理
 
-1. 打开 `CCProjectSpider/scripts/aggregate_data.py` 文件，在 `file_list` 中添加爬取到的 `csv` 文件路径。
-2. 在命令行运行上述文件。
-3. 在`CCProjectSpider/json` 文件夹中可以找到最终的数据文件 `final_data.json` 
+数据处理相关脚本如下所示：
+
+1. 打开 `code/spider/scripts/aggregate_data.py` 文件，在 `file_list` 中添加爬取到的 `csv` 文件路径。
+2. 在`code/spider/scripts` 目录下使用命令行运行上述 python 脚本。
+3. 在`code/spider/json` 文件夹中可以找到最终的数据文件 `final_data.json` 
 
 ### 数据集
 
-我们准备了已经爬取并处理好的数据集  `CCProjectSpider/data.json` 。
+- 爬取好的数据源文件
+  - code/spider/acm_2010.csv - acm_2020.csv
+  - code/spider/arxiv.json
+- 处理好的最终数据文件
+  -   code/spider/data.json
 
 ## III. 流计算部分
 
@@ -118,26 +124,26 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 
 （我们在编写流的过程中总共编写了三个流，为了方便展示，我们将其中一个流分离了出来，与另外两个流分开启动和运行，所以在配置时需要分别配置数据存放的路径）
 
-1. 打开 `CCStreaming/src/main/scala/cc/Main.scala` 文件，配置以下 Spark 参数
+1. 打开 `code/sparkend/streaming/src/main/scala/cc/Main.scala` 文件，配置以下 Spark 参数
    - `SPARK_MASTER_ADDRESS`：目标 master 地址
    - `PAPER_COUNT_DATA_DIR`：HDFS 放数据的文件夹路径（被一个流消耗）
    - `OTHER_DATA_DIR`：HDFS 放数据的文件夹路径（被另外两个流消耗）
    - `CHECK_POINT_DIR`：Checkpoint 文件夹路径
      - 另外还需要在`Main.scala` 文件的 33 行，38 行以及 48 行指定三个流具体的 `checkpoint` 路径
-2. 打开`CCStreaming/src/main/scala/cc/sink/JDBCSink.scala` 文件，找到 `object JDBCSink`，配置 Mysql 参数
+2. 打开`code/sparkend/streaming/src/main/scala/cc/sink/JDBCSink.scala` 文件，找到 `object JDBCSink`，配置 Mysql 参数
    - `JDBC_URL`：数据库地址
    - `USER`：数据库用户
    - `PASSWORD`：数据库密码
 3. 使用 sql scripts 创建数据库表（两份文件均需要用数据库执行）
-   - `CCStreaming/scripts/create_table.sql ` 
-   - `CCStreaming/scripts/create_paper_count_table.sql`
+   - `code/sparkend/streaming/scripts/create_table.sql ` 
+   - `code/sparkend/streaming/scripts/create_paper_count_table.sql`
 
 ### 打包项目
 
 1. 首先需要安装 sbt（可通过 Scala 官网进行安装）。
-2. 进入 `CCStreaming` 文件夹下，在命令行输入命令 `sbt` 等待初始化完成。
+2. 进入 `code/sparkend/streaming` 文件夹下，在命令行输入命令 `sbt` 等待初始化完成。
 3. 在 sbt 命令行中，输入命令 `assembly` 即可进行打包。
-4. 打包完成后可在 `CCStreaming/target/scala-2.12` 中找到已经打包好的 `jar` 文件。
+4. 打包完成后可在 `code/sparkend/streaming/target/scala-2.12` 中找到已经打包好的 `jar` 文件。
 
 ### 运行
 
@@ -148,7 +154,7 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
    - `author_citations`
    - `paper_citations`
    - `subject_paper_count`
-3. 可以使用我们准备好的数据集 `CCProjectSpider/data.json` 以及使用命令 `hdfs dfs -put data.json target_dir` 将数据传递到监听的文件夹下。（如果传递数据时还未启动，则可以直接将数据传递到目标文件夹，**如果流已经启动，则需要先传递到 hdfs 的另外任意一个文件夹，然后再把数据文件移动到监听的文件夹下**，这样做是为了保证数据出现时是原子性的，确保流能够处理数据文件中所有的数据 ）
+3. 可以使用我们准备好的数据集 `code/spider/data.json` 以及使用命令 `hdfs dfs -put data.json target_dir` 将数据传递到监听的文件夹下。（如果传递数据时还未启动，则可以直接将数据传递到目标文件夹，**如果流已经启动，则需要先传递到 hdfs 的另外任意一个文件夹，然后再把数据文件移动到监听的文件夹下**，这样做是为了保证数据出现时是原子性的，确保流能够处理数据文件中所有的数据 ）
 4. 重复启动流之前，需要先删除 checkpoint 文件夹中的数据，否则流不会重新处理已经处理过的文件。
 
 ### 一键启动流
