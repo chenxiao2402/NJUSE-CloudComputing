@@ -15,15 +15,15 @@ public interface AuthorCitationsDAO extends JpaRepository<AuthorCitations,Intege
     @Transactional
     @Modifying
     //近几年各领域作者数
-    @Query(value = "select subject,count(author) as num from author_citations where year >="+
-            "Year(CURDATE())-:year group by `subject` ORDER BY num desc limit 20",nativeQuery = true)
-    List<Object[]> getAuthornumByYear(@Param("year") Long year);
+    @Query(value = "select count(author) as num from author_citations where year >="+
+            ":year and subject=:subject group by subject",nativeQuery = true)
+    List<Object> getAuthornumByYearSubject(@Param("year") Long year, @Param("subject") String subject);
 
     @Transactional
     @Modifying
     //近几年该领域高引用作者的前10名
     @Query(value = "select author,citations from author_citations where year >="+
-            "Year(CURDATE())-:year and subject = :field ORDER BY citations desc limit 10",nativeQuery = true)
+            ":year and subject = :field ORDER BY citations desc limit 10",nativeQuery = true)
     List<Object[]> getAuthorByYearField(@Param("year") Long year, @Param("field") String field);
 
 }

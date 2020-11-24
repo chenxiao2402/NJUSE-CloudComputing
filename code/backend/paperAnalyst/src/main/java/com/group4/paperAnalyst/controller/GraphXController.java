@@ -1,10 +1,7 @@
 package com.group4.paperAnalyst.controller;
 
 import com.group4.paperAnalyst.dao.*;
-import com.group4.paperAnalyst.pojo.AuthorConnectionsAuthor;
-import com.group4.paperAnalyst.pojo.Collaborations;
-import com.group4.paperAnalyst.pojo.RelativeSubjects;
-import com.group4.paperAnalyst.pojo.SubjectPaperCount;
+import com.group4.paperAnalyst.pojo.*;
 import com.group4.paperAnalyst.util.MapSortUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -36,6 +33,9 @@ public class GraphXController {
     @Autowired
     CollaborationDAO collaborationDAO;
 
+    @Autowired
+    SubjectCrossoverRankDAO subjectCrossoverRankDAO;
+
     @ApiOperation(value = "",notes="根据输⼊的年份数量，返回近x年来各个领域的⽂章数和作者数，选择pagerank算法\n" +
             "（graphx部分）得到的前20名）")
     @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
@@ -43,17 +43,14 @@ public class GraphXController {
     @ResponseBody
     public List<Map<String,Object>> findIntersectionOfFields(@Param("year") Long year){
         List<Map<String,Object>> res = new LinkedList<>();
-        Calendar cal = Calendar.getInstance();
-        int year_now = cal.get(Calendar.YEAR);
-        for(int i = year_now;i>year_now-year;i--){
-            List<SubjectPaperCount> subjectPaperCounts = subjectPaperCountDAO.getPaperNumByYear(Long.valueOf(i));
-            if(subjectPaperCounts.isEmpty()){
-                continue;
-            }
-            Map<String,Object> sub_res = new HashMap<>();
-            sub_res.put("year",i);
-            sub_res.put("field",subjectPaperCounts.get(0).getId().getSubject());
-            sub_res.put("count",subjectPaperCounts.get(0).getPaperCount());
+        //
+        List<SubjectCrossoverRank> list_cross = subjectCrossoverRankDAO.getRelatedFields(year);
+        for(SubjectCrossoverRank subjectCrossoverRank:list_cross){
+            Map<String,Object> sub_res = new HashMap();
+            sub_res.put("subject",subjectCrossoverRank.getId().getSubject());
+            List<Object[]> subjectPaperCounts = subjectPaperCountDAO.getCountByYearSubject(year,subjectCrossoverRank.getId().getSubject());
+            sub_res.put("paprtCount",subjectPaperCounts.get(0)[1]);
+            sub_res.put("authorCount",subjectPaperCounts.get(0)[2]);
             res.add(sub_res);
         }
         return res;

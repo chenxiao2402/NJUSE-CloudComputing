@@ -9,6 +9,16 @@ public class SubjectPaperCount {
 
   private long paperCount;
 
+  private long authorCount;
+
+  public long getAuthorCount() {
+    return authorCount;
+  }
+
+  public void setAuthorCount(long authorCount) {
+    this.authorCount = authorCount;
+  }
+
   public SubjectPaperCountPK getId() {
     return id;
   }

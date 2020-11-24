@@ -1,30 +1,20 @@
 package com.group4.paperAnalyst.pojo;
 
-
+import javax.persistence.*;
+@Entity
+@Table(name = "subject_crossover_rank")
 public class SubjectCrossoverRank {
-
-  private long startYear;
-  private String subject;
+  @EmbeddedId
+  private SubjectCrossoverRankPK id;
   private double crossoverRank;
 
-
-  public long getStartYear() {
-    return startYear;
+  public SubjectCrossoverRankPK getId() {
+    return id;
   }
 
-  public void setStartYear(long startYear) {
-    this.startYear = startYear;
+  public void setId(SubjectCrossoverRankPK id) {
+    this.id = id;
   }
-
-
-  public String getSubject() {
-    return subject;
-  }
-
-  public void setSubject(String subject) {
-    this.subject = subject;
-  }
-
 
   public double getCrossoverRank() {
     return crossoverRank;
