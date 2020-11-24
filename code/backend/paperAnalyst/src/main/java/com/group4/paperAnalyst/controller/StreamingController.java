@@ -3,6 +3,7 @@ package com.group4.paperAnalyst.controller;
 import com.group4.paperAnalyst.dao.*;
 import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 import com.group4.paperAnalyst.service.StreamService;
+import com.group4.paperAnalyst.vo.YearPaperCount;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -170,7 +171,8 @@ public class StreamingController {
 
         for (int i = year_now; i > year_now - year; i--) {
             for (int j = 1; j <= 12; j++) {//月份
-                List<SubjectPaperCount> subjectPaperCounts = subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
+                List<SubjectPaperCount> subjectPaperCounts =
+                        subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
                 if (subjectPaperCounts.isEmpty()) {
                     continue;
                 }
@@ -209,7 +211,8 @@ public class StreamingController {
 
         for (int i = year_now; i > year_now - year; i--) {
             for (int j = 1; j <= 12; j++) {//月份
-                List<SubjectPaperCount> subjectPaperCounts = subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
+                List<SubjectPaperCount> subjectPaperCounts =
+                        subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
                 if (subjectPaperCounts.isEmpty()) {
                     continue;
                 }
@@ -227,6 +230,11 @@ public class StreamingController {
         }
         res.put("rankings", rankings);
         return res;
+    }
+
+    @RequestMapping("/YearPaperCount")
+    public List<YearPaperCount> getYearPaperCount() {
+        return subjectPaperCountDAO.getYearPaperCount();
     }
 
     @RequestMapping(value = "/StartPaperCount")
