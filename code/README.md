@@ -210,3 +210,36 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 使用命令 `spark-submit --class "RealTimeMain" --master <你的master节点url> sparkend/graphx/target/scala-2.12/CCGraphx-assembly-0.1.jar <startYear> <subject> <author1> <author2>` 启动图的离线计算。
 
 - `<startYear> <subject> <author1> <author2>`是四个命令行参数，分别为起始年份、领域名以及作者1和作者2的名字，详见`sparkend/graphx/src/main/scala/RealTimeMain.scala`的注释。
+
+## Ⅴ 后端
+
+### 项目描述
+
+ [backend/paperAnalyst](https://github.com/Almarduke/NJUSE-CloudComputing/tree/master/code/backend/paperAnalyst) 是一个springboot后端项目，主要为论文分析系统提供后端数据支持。项目加入了关于流和spark的计算，提高了运行效率。
+
+#### 后端技术栈
+
+1. spring boot
+2. jpa
+3. mysql
+4. spark
+5. maven
+
+### 快速部署
+
+推荐使用IDEA导入并启动本项目，以下介绍通过IDEA启动项目的方式。导入后等待maven下载完依赖即可启动。
+
+#### 1. mysql
+
+安装mysql，并提前在本地创建一个空数据库，并导入数据库文件，在项目的application.properties中修改相应配置:
+
+```yml
+spring.datasource.url=jdbc:mysql://172.19.241.172:3306/cc_data?characterEncoding=UTF-8
+spring.datasource.username=hadoop
+spring.datasource.password=123456
+```
+
+### 项目启动
+
+swagger在本地可以通过http://localhost:8080/swagger-ui.html#进行访问，可以用其进行接口测试。
+
