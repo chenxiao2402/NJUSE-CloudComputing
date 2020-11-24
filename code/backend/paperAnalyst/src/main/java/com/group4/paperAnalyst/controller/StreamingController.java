@@ -48,7 +48,11 @@ public class StreamingController {
     @RequestMapping(value = "/PopularFields", method = RequestMethod.POST)
     @ResponseBody
     public List<PopularFieldsVO> findPopularFields(@Param("year") Long year) {
-        return subjectPaperCountDAO.getPopularFieldsInfoAfterYear(year);
+        return subjectPaperCountDAO.getPopularFieldsInfoAfterYear(year)
+                .stream()
+                .sorted(Comparator.comparing(PopularFieldsVO::getPaperNumber).reversed())
+                .limit(20)
+                .collect(Collectors.toList());
     }
 
     @ApiOperation(value = "", notes = "'根据输⼊的年份数量和领域，返回近x年该领域每年的⽂章数量")
