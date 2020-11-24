@@ -50,7 +50,9 @@ class GraphXPage extends React.Component<any, IState> {
                 this.setState({
                     columns: columns,
                     intersectionData: intersectionData,
-                    searchButtonDisabled: false
+                    searchButtonDisabled: false,
+                    showAuthorConnection: false,
+                    showRelatedFields: false
                 });
             });
         });

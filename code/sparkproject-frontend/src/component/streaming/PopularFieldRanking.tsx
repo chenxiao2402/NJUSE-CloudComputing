@@ -127,7 +127,8 @@ class PopularFieldRanking extends Component<any, IState>{
                 data: this.state.annualData.map((e) => e.year),
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                // position: 'right'
             },
             series: [{
                 data: this.state.annualData.map((e) => e.count),
@@ -137,7 +138,7 @@ class PopularFieldRanking extends Component<any, IState>{
                 show: true,
                 position: 'top',
                 formatter: (param) => {
-                    return this.state.annualData[param.dataIndex].field;
+                    return this.state.annualData[param.dataIndex].field.split(' ').join('\n');
                 }
             }
         });
@@ -154,7 +155,7 @@ class PopularFieldRanking extends Component<any, IState>{
                     <InputNumber min={2010} max={2016} defaultValue={2016} onChange={(year) => {this.setState({year: Number(year)})}} />
                     <Button shape='circle' icon={<SearchOutlined/>} type='primary' onClick={this.yearSelected} disabled={this.state.searchButtonDisabled}/>
                 </Space>
-                <Row gutter={120}>
+                <Row gutter={200}>
                     <Col span={13}>
                         <div style={{textAlign: 'center'}} >
                             <Space>

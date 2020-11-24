@@ -34,7 +34,7 @@ class PopularFields extends React.Component<any, IState> {
             return
         }
         sendRequest(URL.PAPER_NUMBERS, {year: this.state.year, field: field}, (data) => {
-            const paperNumberData = data.map((e) => {return {year: e.year, paperNumber: e.paperNumber}});
+            const paperNumberData = data.map((e) => {return {year: e.year, paperNumber: e.count}});
             this.setState({paperNumberData: paperNumberData, visible1: true})
         })
     };
@@ -61,6 +61,10 @@ class PopularFields extends React.Component<any, IState> {
 
     loadTable() {
         sendRequest(URL.POPULAR_FIELDS, {year: this.state.year}, (fieldData) => {
+            fieldData = fieldData.map((e) => {
+               e.field = e.field.split('(')[0];
+               return e;
+            });
             const columns = [
                 { title: '所属领域', dataIndex: 'field', key: 'field' },
                 { title: '文章数量', dataIndex: 'paperNumber', key: 'paperNumber' },

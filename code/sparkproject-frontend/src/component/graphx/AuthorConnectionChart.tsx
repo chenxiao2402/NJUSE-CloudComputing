@@ -9,7 +9,7 @@ const { Option } = Select;
 
 const defaultProps = {
     visible: false,
-    field: 'Machine Learning',
+    field: '',
     year: 2016,
     onClick: Function,
 };
@@ -39,14 +39,15 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
         };
     }
 
+    names = [];
+
     componentDidUpdate(): void {
-        if (!localStorage.getItem('dataLoaded') || localStorage.getItem('field') !== this.props.field) {
+        if (!localStorage.getItem('dataLoaded3') || localStorage.getItem('field') !== this.props.field) {
             sendRequest(URL.AUTHOR_CONNECTIONS, {year: this.props.year, field: this.props.field}, (data) => {
                 const names = new Set<String>();
                 data.nodes.forEach((e) => { names.add(e.name)} );
-                this.setState({
-                    names: Array.from(names)
-                });
+                this.names = Array.from(names);
+
                 const myChart = echarts.init(document.getElementById('authorConnectionChart'));
                 myChart.setOption( {
                     color: COLORS,
@@ -109,23 +110,15 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
                         }
                     ]
                 });
-                myChart.on('click', (param) => {
-                    const name = param.name;
-                    if (name.indexOf('#') < 0) {
-                        this.setState({
-                            author: param.name
-                        })
-                    }
-                });
+                localStorage.setItem('dataLoaded3', 'true');
+                localStorage.setItem('field', this.props.field);
                 window.onresize = () => {
                     myChart.resize();
                 };
-                localStorage.setItem('dataLoaded', 'true');
-                localStorage.setItem('field', this.props.field);
             })
         }
         if (!this.props.visible) {
-            localStorage.removeItem('dataLoaded');
+            localStorage.removeItem('dataLoaded3');
             localStorage.removeItem('field');
         }
     }
@@ -156,10 +149,10 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
                     <Space style={{marginBottom: 16}} size={'large'}>
                         <span style={{fontSize: 18, fontWeight: 'bolder'}}>合作关系探索</span>
                         <Select suffixIcon={<UserOutlined/>} style={{ width: 150 }} onChange={(v) => {this.setState({sourceName: String(v)})}}>
-                            {this.state.names.map((name) => {return <Option value={name}>{name}</Option>})}
+                            {this.names.map((name) => {return <Option value={name}>{name}</Option>})}
                         </Select>
                         <Select suffixIcon={<UserOutlined/>} style={{ width: 150 }} onChange={(v) => {this.setState({targetName: String(v)})}}>
-                            {this.state.names.map((name) => {return <Option value={name}>{name}</Option>})}
+                            {this.names.map((name) => {return <Option value={name}>{name}</Option>})}
                         </Select>
                         <Button shape='circle' icon={<SearchOutlined/>} onClick={this.editAuthorModal}/>
                     </Space>

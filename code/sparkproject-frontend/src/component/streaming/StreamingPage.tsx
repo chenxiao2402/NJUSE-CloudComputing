@@ -1,7 +1,7 @@
 import React, {Component, lazy, Suspense} from 'react';
 import {Route, Switch} from 'react-router-dom';
-import {Button, Radio} from 'antd';
-import { LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
+import {Radio} from 'antd';
+// import { LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
 import {RadioChangeEvent} from 'antd/lib/radio';
 import ROUTES from '../../utilities/routes';
 import {URL, sendRequest} from "../../utilities/axios";
@@ -33,63 +33,63 @@ class StreamingPage extends Component<any, IState> {
         };
     }
 
-    loadStream = () => {
-        if (!localStorage.getItem('dataLoaded')) {
-        //     this.setState({
-        //         loadingStream: true
-        //     });
-        //     setInterval(() => {
-        //         if (localStorage.getItem('dataLoaded')) {
-        //             clearInterval();
-        //             this.forceUpdate();
-        //             window.location.href = ROUTES.POPULAR_FIELDS;
-        //         } else {
-        //             sendRequest(URL.YEAR_PAPER_COUNT, {}, (data) => {
-        //                 console.log(data);
-        //                 const dataNumber = data.map(e => e.count).reduce((a, b) => a + b);
-        //                 const dataStableDuration = this.state.dataStableDuration + (this.state.dataNumber === dataNumber ? 1 : 0);
-        //                 this.setState({
-        //                     dataNumber: dataNumber,
-        //                     dataStableDuration: dataStableDuration,
-        //                 });
-        //                 if (dataStableDuration >= 5) {
-        //                     localStorage.setItem('dataLoaded', 'true');
-        //                 }
-        //                 this.setBarChart(data);
-        //
-        //             })
-        //         }
-        //     }, 1000);
-            sendRequest(URL.START_PAPER_COUNT, {}, () => {
-                this.setState({
-                    loadingStream: true
-                });
-                setInterval(() => {
-                    if (localStorage.getItem('dataLoaded')) {
-                        clearInterval();
-                        this.forceUpdate();
-                        window.location.href = ROUTES.POPULAR_FIELDS;
-                    } else {
-                        sendRequest(URL.YEAR_PAPER_COUNT, {}, (data) => {
-                            const dataNumber = data.map(e => e.count).reduce((a, b) => a + b);
-                            const dataStableDuration = this.state.dataStableDuration + (this.state.dataNumber === dataNumber ? 1 : 0);
-                            this.setState({
-                                dataNumber: dataNumber,
-                                dataStableDuration: dataStableDuration,
-                            });
-                            if (dataStableDuration >= 5) {
-                                localStorage.setItem('dataLoaded', 'true');
-                            }
-                            this.setBarChart(data);
-                        })
-                    }
-                }, 1000);
-            });
-        } else {
-            window.location.href = ROUTES.POPULAR_FIELDS;
-            this.forceUpdate();
-        }
-    };
+    // loadStream = () => {
+    //     if (!localStorage.getItem('dataLoaded')) {
+    //     //     this.setState({
+    //     //         loadingStream: true
+    //     //     });
+    //     //     setInterval(() => {
+    //     //         if (localStorage.getItem('dataLoaded')) {
+    //     //             clearInterval();
+    //     //             this.forceUpdate();
+    //     //             window.location.href = ROUTES.POPULAR_FIELDS;
+    //     //         } else {
+    //     //             sendRequest(URL.YEAR_PAPER_COUNT, {}, (data) => {
+    //     //                 console.log(data);
+    //     //                 const dataNumber = data.map(e => e.count).reduce((a, b) => a + b);
+    //     //                 const dataStableDuration = this.state.dataStableDuration + (this.state.dataNumber === dataNumber ? 1 : 0);
+    //     //                 this.setState({
+    //     //                     dataNumber: dataNumber,
+    //     //                     dataStableDuration: dataStableDuration,
+    //     //                 });
+    //     //                 if (dataStableDuration >= 5) {
+    //     //                     localStorage.setItem('dataLoaded', 'true');
+    //     //                 }
+    //     //                 this.setBarChart(data);
+    //     //
+    //     //             })
+    //     //         }
+    //     //     }, 1000);
+    //         sendRequest(URL.START_PAPER_COUNT, {}, () => {
+    //             this.setState({
+    //                 loadingStream: true
+    //             });
+    //             setInterval(() => {
+    //                 if (localStorage.getItem('dataLoaded')) {
+    //                     clearInterval();
+    //                     this.forceUpdate();
+    //                     window.location.href = ROUTES.POPULAR_FIELDS;
+    //                 } else {
+    //                     sendRequest(URL.YEAR_PAPER_COUNT, {}, (data) => {
+    //                         const dataNumber = data.map(e => e.count).reduce((a, b) => a + b);
+    //                         const dataStableDuration = this.state.dataStableDuration + (this.state.dataNumber === dataNumber ? 1 : 0);
+    //                         this.setState({
+    //                             dataNumber: dataNumber,
+    //                             dataStableDuration: dataStableDuration,
+    //                         });
+    //                         if (dataStableDuration >= 5) {
+    //                             localStorage.setItem('dataLoaded', 'true');
+    //                         }
+    //                         this.setBarChart(data);
+    //                     })
+    //                 }
+    //             }, 1000);
+    //         });
+    //     } else {
+    //         window.location.href = ROUTES.POPULAR_FIELDS;
+    //         this.forceUpdate();
+    //     }
+    // };
 
     componentDidMount(): void {
         sendRequest(URL.YEAR_PAPER_COUNT, {}, (data) => {
@@ -145,14 +145,14 @@ class StreamingPage extends Component<any, IState> {
     render() {
         // alert(localStorage.getItem('dataLoaded'));
         return (
-            !localStorage.getItem('dataLoaded') ?
-                <div>
-                    <div style={{textAlign: 'center'}}>
-                        <span style={{width: 180, display: 'inline-block', textAlign: 'left'}}>流读取论文数：{this.state.dataNumber}</span>
-                        {this.state.loadingStream ? <LoadingOutlined /> : <Button shape='circle' icon={<ReloadOutlined/>} onClick={this.loadStream} />}
-                    </div>
-                    <div id={'streamingChart'} style={{width: '100%', height: 700 }}/>
-                </div> :
+            // !localStorage.getItem('dataLoaded') ?
+            //     <div>
+            //         <div style={{textAlign: 'center'}}>
+            //             <span style={{width: 180, display: 'inline-block', textAlign: 'left'}}>流读取论文数：{this.state.dataNumber}</span>
+            //             {this.state.loadingStream ? <LoadingOutlined /> : <Button shape='circle' icon={<ReloadOutlined/>} onClick={this.loadStream} />}
+            //         </div>
+            //         <div id={'streamingChart'} style={{width: '100%', height: 700 }}/>
+            //     </div> :
                 <div>
                     <Radio.Group defaultValue={window.location.pathname} buttonStyle='solid' onChange={onChange}
                                  style={{marginBottom: 16, textAlign: 'center', width: '100%'}}>
