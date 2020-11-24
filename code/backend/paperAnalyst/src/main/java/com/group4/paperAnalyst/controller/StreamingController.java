@@ -153,7 +153,6 @@ public class StreamingController {
     @ApiOperation(value = "", notes = "根据输⼊的年份数量，返回近x年来每⼀年的热⻔领域（按照⽂章数）和该领域的⽂章数")
     @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
     @RequestMapping(value = "/PopularFieldRanking", method = RequestMethod.POST)
-    @ResponseBody
     public PopularFieldRankingVO findPopularFieldRanking(@Param("year") Long year) {
 
         Calendar cal = Calendar.getInstance();
@@ -186,37 +185,6 @@ public class StreamingController {
         result.setFields(new ArrayList<>(appearedFields));
 
         return result;
-//        Map<String, Object> res = new HashMap<>();
-//        Set<String> fields = new HashSet<>();
-//        List<Map<String, Object>> rankings = new LinkedList<>();
-//
-//
-//        for (long i = yearNow - year + 1; i <= yearNow; i++) {
-//            for (int j = 1; j <= 12; j++) {//月份
-//                List<SubjectPaperCount> subjectPaperCounts =
-//                        subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
-//                if (subjectPaperCounts.isEmpty()) {
-//                    continue;
-//                }
-//
-//                String date = String.valueOf(i) + "-" + String.valueOf(j);
-//                Map<String, Object> sub_res = new HashMap<>();
-//                sub_res.put("date", date);
-//                List<Map<String, Object>> subFields = new LinkedList<>();
-//                for (SubjectPaperCount subjectPaperCount : subjectPaperCounts) {
-//                    fields.add(subjectPaperCount.getId().getSubject());
-//                    Map<String, Object> subFieldsItem = new HashMap<>();
-//                    subFieldsItem.put("name", subjectPaperCount.getId().getSubject());
-//                    subFieldsItem.put("paperNumber", subjectPaperCount.getPaperCount());
-//                    subFields.add(subFieldsItem);
-//                }
-//                sub_res.put("fields", subFields);
-//                rankings.add(sub_res);
-//            }
-//        }
-//        res.put("fields", fields);
-//        res.put("rankings", rankings);
-//        return res;
     }
 
     @RequestMapping("/YearPaperCount")
@@ -230,7 +198,7 @@ public class StreamingController {
     }
 
     private String dateString(Long year, Long month) {
-        if (month <= 10) {
+        if (month < 10) {
             return year.toString() + "-0" + month.toString();
         } else {
             return year.toString() + "-" + month.toString();

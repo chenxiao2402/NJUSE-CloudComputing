@@ -2,8 +2,6 @@ package com.group4.paperAnalyst.dao;
 
 import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 import com.group4.paperAnalyst.vo.YearPaperCount;
-import com.group4.paperAnalyst.vo.YearMonthSubjectCount;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -38,6 +36,6 @@ public interface SubjectPaperCountDAO extends JpaRepository<SubjectPaperCount, I
     @Transactional
     @Modifying
     @Query(value = "select subject,paper_count,author_count from subject_paper_count where subject = :subject and "
-            +"year >= :year",nativeQuery = true)
-    List<Object[]> getCountByYearSubject(@Param("year") Long year,@Param("subject")String subject);
+            + "year >= :year", nativeQuery = true)
+    List<Object[]> getCountByYearSubject(@Param("year") Long year, @Param("subject") String subject);
 }

@@ -24,7 +24,7 @@ public class SubjectPaperCount {
   }
 
   public Long getMonth() {
-    return id.getYear();
+    return id.getMonth();
   }
 
   public void setId(SubjectPaperCountPK id) {
