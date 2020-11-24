@@ -180,3 +180,33 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 
   
 
+## Ⅳ. 图计算部分
+
+### 环境依赖
+
+- Spark  3.0.1 + Hadoop  3.2
+  - 总共四台云主机：一台 master + 三台 slaves
+- Scala  2.12.12
+- Mysql  8.0.22
+
+### 打包项目
+
+1. 打开 `sparkend/graphx/src/main/scala/Utils.scala` 文件，找到 `sparkSession.read.json("/data/paper/arxiv_final.json")`函数，将其中的`/data/paper/arxiv_final.json`改为自己在HDFS上存放的数据集的目录。
+2. 打开`sparkend/graphx/src/main/scala/MysqlHelper.scala` 文件，找到 `.option("key", "value")`函数，根据key配置相应的value，为Mysql连接配置参数：
+   - `url`：数据库地址
+   - `user`：数据库用户
+   - `password`：数据库密码
+3. 使用 sql scripts 创建MySQL数据库表（用MySQL执行）
+   - `sparkend/graphx/scripts/create_table.sql`
+4. 在`sparkend/graphx/`目录下运行`sbt assembly`编译项目（需要安装有sbt，我们的sbt版本为1.4.1）。
+
+### 运行离线计算
+
+1. 将数据集放到上一步中设置的HDFS路径上，如`hdfs dfs -put CCProjectSpider/data.json <HDFS路径>`
+2.  `使用命令 `spark-submit --class "OfflineMain" --master <你的master节点url> sparkend/graphx/target/scala-2.12/CCGraphx-assembly-0.1.jar` 启动图的离线计算。
+
+### 运行实时计算
+
+使用命令 `spark-submit --class "RealTimeMain" --master <你的master节点url> sparkend/graphx/target/scala-2.12/CCGraphx-assembly-0.1.jar <startYear> <subject> <author1> <author2>` 启动图的离线计算。
+
+- `<startYear> <subject> <author1> <author2>`是四个命令行参数，分别为起始年份、领域名以及作者1和作者2的名字，详见`sparkend/graphx/src/main/scala/RealTimeMain.scala`的注释。
