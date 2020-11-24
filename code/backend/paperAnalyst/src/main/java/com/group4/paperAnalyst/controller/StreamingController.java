@@ -5,6 +5,7 @@ import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 import com.group4.paperAnalyst.service.StreamService;
 import com.group4.paperAnalyst.util.MapSortUtil;
 import com.group4.paperAnalyst.vo.PopularFieldRankingVO;
+import com.group4.paperAnalyst.vo.PopularFieldsVO;
 import com.group4.paperAnalyst.vo.YearPaperCount;
 import com.group4.paperAnalyst.vo.YearRankingVO;
 import io.swagger.annotations.ApiImplicitParam;
@@ -45,27 +46,27 @@ public class StreamingController {
     @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
     @RequestMapping(value = "/PopularFields", method = RequestMethod.POST)
     @ResponseBody
-    public List<Map<String, Object>> findPopularFields(@Param("year") Long year) {
-        List<Map<String, Object>> res = new LinkedList<>();
-        // year内的
-        //按照论文数量从高到低排序
-        List<Object[]> list_paper = paperCitationsDAO.getPapernumByYear(year);
-
-        Map<String, Integer> mapForSort = new HashMap<>();
-        for (Object[] o : list_paper) {
-            mapForSort.put(o[0].toString(), Integer.valueOf(o[1].toString()));
-        }
-        Map<String, Integer> mapSorted = MapSortUtil.sortByValueDesc(mapForSort);
-        for (String subject : mapSorted.keySet()) {
-            Map<String, Object> sub_res = new HashMap<>();
-            List<Object> list_author = authorCitationsDAO.getAuthornumByYearSubject(year, subject);
-            int author_num = Integer.valueOf(list_author.get(0).toString());
-            sub_res.put("field", subject);
-            sub_res.put("authorNumber", author_num);
-            sub_res.put(("paperNumber"), mapSorted.get(subject));
-            res.add(sub_res);
-        }
-        return res;
+    public List<PopularFieldsVO> findPopularFields(@Param("year") Long year) {
+        return subjectPaperCountDAO.getPopularFieldsInfoAfterYear(year);
+//        List<Map<String, Object>> res = new LinkedList<>();
+//        //按照论文数量从高到低排序
+//        List<Object[]> list_paper = paperCitationsDAO.getPaperNumByYear(year);
+//
+//        Map<String, Integer> mapForSort = new HashMap<>();
+//        for (Object[] o : list_paper) {
+//            mapForSort.put(o[0].toString(), Integer.valueOf(o[1].toString()));
+//        }
+//        Map<String, Integer> mapSorted = MapSortUtil.sortByValueDesc(mapForSort);
+//        for (String subject : mapSorted.keySet()) {
+//            Map<String, Object> sub_res = new HashMap<>();
+//            List<Object> list_author = authorCitationsDAO.getAuthornumByYearSubject(year, subject);
+//            int author_num = Integer.valueOf(list_author.get(0).toString());
+//            sub_res.put("field", subject);
+//            sub_res.put("authorNumber", author_num);
+//            sub_res.put(("paperNumber"), mapSorted.get(subject));
+//            res.add(sub_res);
+//        }
+//        return res;
     }
 
     @ApiOperation(value = "", notes = "'根据输⼊的年份数量和领域，返回近x年该领域每年的⽂章数量")
@@ -155,8 +156,7 @@ public class StreamingController {
     @RequestMapping(value = "/PopularFieldRanking", method = RequestMethod.POST)
     public PopularFieldRankingVO findPopularFieldRanking(@Param("year") Long year) {
 
-        Calendar cal = Calendar.getInstance();
-        int yearNow = cal.get(Calendar.YEAR);
+        int yearNow = getCurrentYear();
 
         PopularFieldRankingVO result = new PopularFieldRankingVO();
         Set<String> appearedFields = new HashSet<>();
@@ -172,7 +172,7 @@ public class StreamingController {
                 String date = dateString(currentYear, entry.getKey());
                 YearRankingVO yearRankingVO = new YearRankingVO(date);
 
-                List<YearRankingVO.FieldPaperCount> fields =  entry.getValue().stream().limit(10)
+                List<YearRankingVO.FieldPaperCount> fields = entry.getValue().stream().limit(10)
                         .map(s -> {
                             appearedFields.add(s.getId().getSubject());
                             return new YearRankingVO.FieldPaperCount(s.getId().getSubject(), s.getPaperCount());
@@ -203,5 +203,10 @@ public class StreamingController {
         } else {
             return year.toString() + "-" + month.toString();
         }
+    }
+
+    private int getCurrentYear() {
+        Calendar cal = Calendar.getInstance();
+        return cal.get(Calendar.YEAR);
     }
 }
