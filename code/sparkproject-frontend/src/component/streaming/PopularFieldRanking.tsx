@@ -13,7 +13,9 @@ interface IState {
     index: number,
     year: number,
     selectedYear: number,
+    initial: boolean,
     colorDict: {},
+    searchButtonDisabled: boolean,
     playButtonDisabled: boolean,
     playingInterval: any,
     dataNumber: number,
@@ -30,7 +32,9 @@ class PopularFieldRanking extends Component<any, IState>{
             index: 0,
             year: 2016,
             selectedYear: 2016,
+            initial: true,
             colorDict: {},
+            searchButtonDisabled: false,
             playButtonDisabled: true,
             playingInterval: null,
             dataNumber: 0,
@@ -39,35 +43,40 @@ class PopularFieldRanking extends Component<any, IState>{
     }
 
     yearSelected = () => {
-        clearInterval(this.state.playingInterval);
-        this.setState({selectedYear: this.state.year});
+        if (this.state.year !== this.state.selectedYear || this.state.initial) {
+            clearInterval(this.state.playingInterval);
+            this.setState({selectedYear: this.state.year, searchButtonDisabled: true, playButtonDisabled: true, initial: false}, () => {
+                sendRequest(URL.POPULAR_FIELD_RANKING, {year: this.state.selectedYear}, (originalData) => {
+                    let nameSet = new Set();
+                    originalData.fields.forEach((field) => { nameSet.add(field); });
+                    const colorDict = getColorDict(nameSet);
+                    this.setState({
+                        dynamicRankingData: originalData.rankings,
+                        index: 0,
+                        colorDict: colorDict,
+                        playButtonDisabled: false,
+                        searchButtonDisabled: false,
+                    });
+                    this.setRankingData();
+                });
 
-        sendRequest(URL.POPULAR_FIELD_RANKING, {year: this.state.selectedYear}, (originalData) => {
-            let nameSet = new Set();
-            originalData.fields.forEach((field) => { nameSet.add(field); });
-            const colorDict = getColorDict(nameSet);
-            this.setState({
-                dynamicRankingData: originalData.rankings,
-                index: 0,
-                colorDict: colorDict,
-                playButtonDisabled: false
-            }, this.setRankingData);
-        });
-
-        sendRequest(URL.POPULAR_ANNUAL_FIELD, {year: this.state.selectedYear}, (annualData) => {
-            this.setState({
-                annualData: annualData
+                sendRequest(URL.POPULAR_ANNUAL_FIELD, {year: this.state.selectedYear}, (annualData) => {
+                    this.setState({
+                        annualData: annualData
+                    });
+                });
             });
-        });
+        }
     };
 
     startPlay = () => {
-        this.setState({index: 0, playButtonDisabled: true});
+        this.setState({index: 0, playButtonDisabled: true, searchButtonDisabled: true});
         const playingInterval = setInterval(() => {
             if (this.state.index >= this.state.dynamicRankingData.length) {
                 clearInterval();
                 this.setState({
                     playButtonDisabled: false,
+                    searchButtonDisabled: false,
                     playingInterval: null
                 });
             } else {
@@ -143,7 +152,7 @@ class PopularFieldRanking extends Component<any, IState>{
                 <Space style={{marginLeft: 16, marginTop: 16, marginBottom: 32}}>
                     <span>起始年份</span>
                     <InputNumber min={2010} max={2016} defaultValue={2016} onChange={(year) => {this.setState({year: Number(year)})}} />
-                    <Button shape='circle' icon={<SearchOutlined/>} type='primary' onClick={this.yearSelected}/>
+                    <Button shape='circle' icon={<SearchOutlined/>} type='primary' onClick={this.yearSelected} disabled={this.state.searchButtonDisabled}/>
                 </Space>
                 <Row gutter={120}>
                     <Col span={13}>

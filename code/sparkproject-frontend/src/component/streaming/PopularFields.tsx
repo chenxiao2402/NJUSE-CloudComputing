@@ -105,7 +105,7 @@ class PopularFields extends React.Component<any, IState> {
                 {
                     name: '论文发表数',
                     type: 'pie',
-                    radius: '50%',
+                    radius: '60%',
                     center: ['50%', '50%'],
                     data: this.state.fieldData.map((e) => {
                         return {
@@ -139,6 +139,7 @@ class PopularFields extends React.Component<any, IState> {
     yearSelected = () => {
         this.loadTable();
         this.loadChart();
+        this.forceUpdate();
     };
 
     render() {
@@ -155,7 +156,7 @@ class PopularFields extends React.Component<any, IState> {
                                pagination={false} bordered={true} size={'small'} scroll={{y: 600}}/>
                     </Col>
                     <Col span={12}>
-                        <div id={'pieChart'} style={{width: '100%', height: '100%', marginTop: 64}} />
+                        <div id={'pieChart'} style={{width: '100%', height: 640, marginTop: 64}} />
                     </Col>
                 </Row>
                 <PaperNumbers visible={this.state.visible1} width={600} onCancel={this.editPaperNumModal} paperNumberData={this.state.paperNumberData}/>
