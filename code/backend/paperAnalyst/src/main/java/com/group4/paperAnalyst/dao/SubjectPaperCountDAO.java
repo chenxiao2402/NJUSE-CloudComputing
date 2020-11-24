@@ -28,7 +28,7 @@ public interface SubjectPaperCountDAO extends JpaRepository<SubjectPaperCount, I
     List<SubjectPaperCount> getFieldTop10Bydate(@Param("year") Long year, @Param("month") Long month);
 
     @Query(value = "select new com.group4.paperAnalyst.vo.YearPaperCount(s.id.year, sum(s.paperCount)) " +
-            "from SubjectPaperCount s group by s.id.year")
+            "from SubjectPaperCount s where s.id.year >= 2010 group by s.id.year")
     List<YearPaperCount> getYearPaperCount();
 
     @Query("select s " +
