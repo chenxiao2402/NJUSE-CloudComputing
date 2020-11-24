@@ -28,4 +28,10 @@ public interface SubjectPaperCountDAO extends JpaRepository<SubjectPaperCount, I
     @Query(value = "select new com.group4.paperAnalyst.vo.YearPaperCount(s.id.year, sum(s.paperCount)) " +
             "from SubjectPaperCount s group by s.id.year")
     List<YearPaperCount> getYearPaperCount();
+
+    @Transactional
+    @Modifying
+    @Query(value = "select subject,paper_count,author_count from subject_paper_count where subject = :subject and "
+            +"year >= :year",nativeQuery = true)
+    List<Object[]> getCountByYearSubject(@Param("year") Long year,@Param("subject")String subject);
 }
