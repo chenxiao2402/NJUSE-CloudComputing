@@ -202,7 +202,7 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 
 ### 运行离线计算
 
-1. 将数据集放到上一步中设置的HDFS路径上，如`hdfs dfs -put CCProjectSpider/data.json <HDFS路径>`
+1. 将数据集放到上一步中设置的HDFS路径上，如`hdfs dfs -put spider/json/final_data.json <HDFS路径>`
 2.  `使用命令 `spark-submit --class "OfflineMain" --master <你的master节点url> sparkend/graphx/target/scala-2.12/CCGraphx-assembly-0.1.jar` 启动图的离线计算。
 
 ### 运行实时计算
