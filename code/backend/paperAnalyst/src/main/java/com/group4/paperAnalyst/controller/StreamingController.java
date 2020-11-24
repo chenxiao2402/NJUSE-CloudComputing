@@ -4,10 +4,10 @@ import com.group4.paperAnalyst.dao.*;
 import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 import com.group4.paperAnalyst.service.StreamService;
 import com.group4.paperAnalyst.util.MapSortUtil;
+import com.group4.paperAnalyst.vo.YearPaperCount;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
@@ -186,41 +186,12 @@ public class StreamingController {
         return res;
     }
 
-    @ApiOperation(value = "", notes = "返回数据库中每⼀年的论文总数，会轮询调用这个方法，为了'启动云计算'的需求")
-    @RequestMapping(value = "/LoadedDataNumbers", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String, Object> findAllPopularFieldRanking(@Param("year") Long year) {
-        Map<String, Object> res = new HashMap<>();
-        Set<String> fields = new HashSet<>();
-        List<Map<String, Object>> rankings = new LinkedList<>();
-
-        Calendar cal = Calendar.getInstance();
-        int year_now = cal.get(Calendar.YEAR);
-
-        for (int i = year_now; i > year_now - year; i--) {
-            for (int j = 1; j <= 12; j++) {//月份
-                List<SubjectPaperCount> subjectPaperCounts = subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
-                if (subjectPaperCounts.isEmpty()) {
-                    continue;
-                }
-                String date = String.valueOf(i) + "-" + String.valueOf(j);
-                Map<String, Object> sub_res = new HashMap<>();
-                sub_res.put("date:", date);
-                List<Map<String, Object>> subFields = new LinkedList<>();
-                long count = 0;
-                for (SubjectPaperCount subjectPaperCount : subjectPaperCounts) {
-                    count += subjectPaperCount.getPaperCount();
-                }
-                sub_res.put("count:", count);
-                rankings.add(sub_res);
-            }
-        }
-        res.put("rankings", rankings);
-        return res;
+    @RequestMapping("/YearPaperCount")
+    public List<YearPaperCount> getYearPaperCount() {
+        return subjectPaperCountDAO.getYearPaperCount();
     }
 
-    @ApiOperation(value = "", notes = "启动云计算")
-    @RequestMapping(value = "/StartPaperCount", method = RequestMethod.POST)
+    @RequestMapping(value = "/StartPaperCount")
     public String startStreamingService() {
         return streamService.startPaperCountStream();
     }
