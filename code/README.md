@@ -107,7 +107,7 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 
 - 爬取并处理好的各年份数据源文件
   - code/spider/json/acm_2005.json - acm_2020.json
-  - code/spider/json/arxiv.json
+  - code/spider/json/arxiv_final.json
 - 处理好的最终数据文件
   -   code/spider/json/final_data.json
 
