@@ -27,7 +27,7 @@ MYSQL_DBNAME = 'ccproject'
 MYSQL_USER = '在这填用户名'
 MYSQL_PASSWORD = '在这填密码'
 
-LOG_LEVEL = 'INFO'  # 过滤DEBUG级日志
+  # 过滤DEBUG级日志
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay

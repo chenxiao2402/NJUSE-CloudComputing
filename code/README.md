@@ -97,7 +97,7 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 
 ### 数据预处理
 
-数据处理相关脚本如下所示：
+数据处理步骤如下所示：
 
 1. 打开 `code/spider/scripts/aggregate_data.py` 文件，在 `file_list` 中添加爬取到的 `csv` 文件路径。
 2. 在`code/spider/scripts` 目录下使用命令行运行上述 python 脚本。
@@ -105,11 +105,11 @@ pymysql 0.10.1 (不是必须，如果要指定 Mysql 数据库作为输出的话
 
 ### 数据集
 
-- 爬取好的数据源文件
-  - code/spider/acm_2010.csv - acm_2020.csv
-  - code/spider/arxiv.json
+- 爬取并处理好的各年份数据源文件
+  - code/spider/json/acm_2005.json - acm_2020.json
+  - code/spider/json/arxiv.json
 - 处理好的最终数据文件
-  -   code/spider/data.json
+  -   code/spider/json/final_data.json
 
 ## III. 流计算部分
 
