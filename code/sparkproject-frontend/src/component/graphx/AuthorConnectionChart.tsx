@@ -1,9 +1,10 @@
-import {COLORS} from '../../utilities/color';
 import React, {Component} from 'react';
-import echarts from '../../utilities/echarts';
 import {Space, Select,  Button} from 'antd';
 import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import CollaboratorModal from './CollaboratorModal';
+import {URL, sendRequest} from "../../utilities/axios";
+import echarts from "../../utilities/echarts";
+import {COLORS} from "../../utilities/color";
 const { Option } = Select;
 
 const defaultProps = {
@@ -136,9 +137,8 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
 
     componentDidUpdate(): void {
         if (!localStorage.getItem('dataLoaded') || localStorage.getItem('field') !== this.props.field) {
-            try {
+            sendRequest(URL.AUTHOR_CONNECTIONS, {year: this.props.year, field: this.props.field}, (data) => {
                 const myChart = echarts.init(document.getElementById('authorConnectionChart'));
-                let {graph, categories} = this.fakeData();
 
                 myChart.setOption( {
                     color: COLORS,
@@ -155,22 +155,22 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
                         containLabel: true
                     },
                     tooltip: {},
-                    legend: [{
-                        // selectedMode: 'single',
-                        data: categories,
-                        orient: 'vertical',
-                        left: 'right',
-                        top: 'center',
-                        // formatter: ' '
-                    }],
+                    // legend: [{
+                    //     // selectedMode: 'single',
+                    //     data: data.categories,
+                    //     orient: 'vertical',
+                    //     left: 'right',
+                    //     top: 'center',
+                    //     // formatter: ' '
+                    // }],
                     series : [
                         {
                             name: '合作者数量',
                             type: 'graph',
                             layout: 'force',
-                            data: graph.nodes,
-                            links: graph.links,
-                            categories: categories.map((a) => {return {name: a}}),
+                            data: data.nodes,
+                            links: data.links,
+                            categories: data.categories.map((a) => {return {name: a}}),
                             roam: true,
                             focusNodeAdjacency: true,
                             itemStyle: {
@@ -208,9 +208,7 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
                 };
                 localStorage.setItem('dataLoaded', 'true');
                 localStorage.setItem('field', this.props.field);
-            } catch (e) {
-                console.log(e);
-            }
+            })
         }
         if (!this.props.visible) {
             localStorage.removeItem('dataLoaded');

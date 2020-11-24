@@ -8,7 +8,7 @@ import {sendRequest, URL} from "../../utilities/axios";
 
 interface IState {
     columns: Array<any>,
-    dataSource: Array<any>,
+    intersectionData: Array<any>,
     field: string,
     year: number,
     selectedYear: number,
@@ -21,7 +21,7 @@ class GraphXPage extends React.Component<any, IState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            columns: [], dataSource: [],
+            columns: [], intersectionData: [],
             field: '', year: 2016, selectedYear: 2016,
             showRelatedFields: false,
             showAuthorConnection: false,
@@ -32,128 +32,24 @@ class GraphXPage extends React.Component<any, IState> {
     loadTable() {
         this.setState({selectedYear: this.state.year});
 
-        sendRequest(URL.INTERSECTION_OF_FIELDS, {year: this.state.selectedYear}, (originalData) => {
-            console.log(originalData);
-        });
-
-        const columns = [
-            {
-                title: '所属领域',
-                dataIndex: 'field',
-                key: 'field',
-            },
-            {
-                title: '文章数量',
-                dataIndex: 'paperNumber',
-                key: 'paperNumber'
-            },
-            {
-                title: '作者数量',
-                dataIndex: 'authorNumber',
-                key: 'authorNumber'
-            },
-            {
-                title: '信息查看',
-                key: 'action',
-                render: (text, record) => (
-                    <Space>
-                        <Button type='link' size='small' onClick={() => this.loadChart(record.field, 'showRelatedFields')}>相关领域</Button>
-                        <Button type='link' size='small' onClick={() => this.loadChart(record.field, 'showAuthorConnection')}>合作关系</Button>
-                    </Space>
-                )
-            }
-        ];
-        const dataSource = [
-            {
-                field: 'Machine Learning',
-                paperNumber: 2341,
-                authorNumber: 1123
-            },
-            {
-                field: 'Static Analysis',
-                paperNumber: 2241,
-                authorNumber: 982
-            },
-            {
-                field: 'Computer Vision',
-                paperNumber: 2159,
-                authorNumber: 1010
-            },
-            {
-                field: 'Security',
-                paperNumber: 2021,
-                authorNumber: 789
-            },
-            {
-                field: 'Database',
-                paperNumber: 1860,
-                authorNumber: 1200
-            },
-            {
-                field: 'Compiling',
-                paperNumber: 1721,
-                authorNumber: 945
-            },
-            {
-                field: 'NLP',
-                paperNumber: 1621,
-                authorNumber: 887
-            },
-            {
-                field: 'Speech Recognition',
-                paperNumber: 1541,
-                authorNumber: 680
-            },
-            {
-                field: 'Network',
-                paperNumber: 1200,
-                authorNumber: 703
-            },
-            {
-                field: 'OS',
-                paperNumber: 1157,
-                authorNumber: 923
-            },
-            {
-                field: 'Graphics',
-                paperNumber: 1241,
-                authorNumber: 884
-            },
-            {
-                field: 'HCI',
-                paperNumber: 941,
-                authorNumber: 645
-            },
-            {
-                field: 'Algorithm',
-                paperNumber: 885,
-                authorNumber: 623
-            },
-            {
-                field: 'Distributed System',
-                paperNumber: 741,
-                authorNumber: 523
-            },
-            {
-                field: 'SE',
-                paperNumber: 606,
-                authorNumber: 555
-            },
-            {
-                field: 'Testing',
-                paperNumber: 500,
-                authorNumber: 324
-            },
-            {
-                field: 'Programming Language',
-                paperNumber: 463,
-                authorNumber: 334
-            }
-        ];
-
-        this.setState({
-            columns: columns,
-            dataSource: dataSource
+        sendRequest(URL.INTERSECTION_OF_FIELDS, {year: this.state.selectedYear}, (intersectionData) => {
+            const columns = [
+                { title: '所属领域', dataIndex: 'field', key: 'field' },
+                { title: '文章数量', dataIndex: 'paperNumber', key: 'paperNumber' },
+                { title: '作者数量', dataIndex: 'authorNumber', key: 'authorNumber'},
+                { title: '信息查看', key: 'action',
+                    render: (text, record) => (
+                        <Space>
+                            <Button type='link' size='small' onClick={() => this.loadChart(record.field, 'showRelatedFields')}>相关领域</Button>
+                            <Button type='link' size='small' onClick={() => this.loadChart(record.field, 'showAuthorConnection')}>合作关系</Button>
+                        </Space>
+                    )
+                }
+            ];
+            this.setState({
+                columns: columns,
+                intersectionData: intersectionData
+            });
         });
     }
 
@@ -186,7 +82,7 @@ class GraphXPage extends React.Component<any, IState> {
                         <div style={{width: '100%', textAlign: 'center', marginBottom: 4}}>
                             <span style={{fontSize: 20, fontWeight: 'bolder'}}>领域交叉度排名</span>
                         </div>
-                        <Table dataSource={this.state.dataSource} columns={this.state.columns}
+                        <Table dataSource={this.state.intersectionData} columns={this.state.columns}
                                pagination={false} bordered={true} size={'small'} scroll={{y: 600}}/>
                     </Col>
                     <Col span={10}>

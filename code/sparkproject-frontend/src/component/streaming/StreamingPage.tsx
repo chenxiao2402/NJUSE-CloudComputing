@@ -26,7 +26,7 @@ class StreamingPage extends Component<any, IState> {
         super(props);
         this.state = {
             loadingStream: false,
-            showLoadingPage: !Boolean(localStorage.getItem('streamLoaded')),
+            showLoadingPage: Boolean(localStorage.getItem('streamLoaded')),
             dataNumber: 0,
             dataStableDuration: 0
         };

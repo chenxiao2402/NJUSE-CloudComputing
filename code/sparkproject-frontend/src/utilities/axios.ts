@@ -3,7 +3,7 @@ import qs from 'qs';
 
 const axios = Axios.create({
     baseURL: "http://localhost:8080", // 这里是本地express启动的服务地址
-    timeout: 8000 // request timeout
+    timeout: 60000 // request timeout
 });
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
 axios.interceptors.request.use((config) => {
@@ -23,7 +23,7 @@ const URL = {
     POPULAR_ANNUAL_FIELD: 'PopularAnnualField',
     INTERSECTION_OF_FIELDS: 'IntersectionOfFields',
     RELATED_FIELDS: 'RelatedFields',
-    AUTHOR_CONNECTIONS: 'AuthorConnection',
+    AUTHOR_CONNECTIONS: 'AuthorConnections',
     COLLABORATORS: 'Collaborators',
     START_PAPER_COUNT: 'StartPaperCount',
     ALL_POPULAR_FIELD_RANKING: 'AllPopularFieldRanking'

@@ -47,10 +47,10 @@ public class GraphXController {
         List<SubjectCrossoverRank> list_cross = subjectCrossoverRankDAO.getRelatedFields(year);
         for(SubjectCrossoverRank subjectCrossoverRank:list_cross){
             Map<String,Object> sub_res = new HashMap();
-            sub_res.put("subject",subjectCrossoverRank.getId().getSubject());
+            sub_res.put("field",subjectCrossoverRank.getId().getSubject());
             List<Object[]> subjectPaperCounts = subjectPaperCountDAO.getCountByYearSubject(year,subjectCrossoverRank.getId().getSubject());
-            sub_res.put("paprtCount",subjectPaperCounts.get(0)[1]);
-            sub_res.put("authorCount",subjectPaperCounts.get(0)[2]);
+            sub_res.put("paperNumber",subjectPaperCounts.get(0)[1]);
+            sub_res.put("authorNumber",subjectPaperCounts.get(0)[2]);
             res.add(sub_res);
         }
         return res;
@@ -99,8 +99,8 @@ public class GraphXController {
                 break;
             }
             Map<String,String> sub_res = new HashMap<>();
-            sub_res.put("field:",key);
-            sub_res.put("paperNumber:",String.valueOf(count_sort.get(key)));
+            sub_res.put("field",key);
+            sub_res.put("paperNumber",String.valueOf(count_sort.get(key)));
             res.add(sub_res);
         }
         return res;
@@ -116,6 +116,7 @@ public class GraphXController {
         Map<String,Object> res = new HashMap<>();
         List<Object> links = new LinkedList();
         List<Object> nodes = new LinkedList();
+        Set<Long> categories = new HashSet<>();
         List<Collaborations> list_collaboration= collaborationDAO.getRelatedFields(year, field);
         List<AuthorConnectionsAuthor> list_author = authorConnectionsAuthorDAO.getAllByYearField(year, field);
         //先找link，要存入每个作者的合作者有多少，遍历一下
@@ -146,21 +147,23 @@ public class GraphXController {
                 subject_source = subject_target;
                 subject_target = temp;
             }
-            res_link.put("source:", subject_source);
-            res_link.put("target:", subject_target);
+            res_link.put("source", subject_source);
+            res_link.put("target", subject_target);
             links.add(res_link);
         }
         //再添加node
         for(AuthorConnectionsAuthor authorConnectionsAuthor:list_author){
             Map<String, Object> res_node= new HashMap<>();
-            res_node.put("category:",authorConnectionsAuthor.getAuthorCategory());
+            res_node.put("category",authorConnectionsAuthor.getAuthorCategory());
             res_node.put("id",authorConnectionsAuthor.getId().getAuthorId());
             res_node.put("name",authorConnectionsAuthor.getAuthorName());
-            res_node.put("collaborators:",collaborators.get(authorConnectionsAuthor.getId().getAuthorId()));
+            res_node.put("collaborators",collaborators.get(authorConnectionsAuthor.getId().getAuthorId()));
             nodes.add(res_node);
+            categories.add(authorConnectionsAuthor.getAuthorCategory());
         }
-        res.put("nodes:",nodes);
-        res.put("links:",links);
+        res.put("nodes", nodes);
+        res.put("links", links);
+        res.put("categories", categories);
         return res;
     }
 
