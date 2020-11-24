@@ -1,31 +1,21 @@
 package com.group4.paperAnalyst.pojo;
 
 import javax.persistence.Embeddable;
+import javax.persistence.SecondaryTable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class SubjectPaperCountPK implements Serializable {
-    private long month;
-
-    private long year;
-
+public class SubjectCrossoverRankPK implements Serializable {
+    private long startYear;
     private String subject;
 
-    public long getMonth() {
-        return month;
+    public long getStartYear() {
+        return startYear;
     }
 
-    public void setMonth(long month) {
-        this.month = month;
-    }
-
-    public long getYear() {
-        return year;
-    }
-
-    public void setYear(long year) {
-        this.year = year;
+    public void setStartYear(long startYear) {
+        this.startYear = startYear;
     }
 
     public String getSubject() {
@@ -40,14 +30,13 @@ public class SubjectPaperCountPK implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SubjectPaperCountPK that = (SubjectPaperCountPK) o;
-        return month == that.month &&
-                year == that.year &&
+        SubjectCrossoverRankPK that = (SubjectCrossoverRankPK) o;
+        return startYear == that.startYear &&
                 subject.equals(that.subject);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(month, year, subject);
+        return Objects.hash(startYear, subject);
     }
 }

@@ -3,9 +3,11 @@ package com.group4.paperAnalyst.controller;
 import com.group4.paperAnalyst.dao.*;
 import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 import com.group4.paperAnalyst.service.StreamService;
+import com.group4.paperAnalyst.util.MapSortUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
@@ -40,41 +42,25 @@ public class StreamingController {
     @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
     @RequestMapping(value = "/PopularFields", method = RequestMethod.POST)
     @ResponseBody
-    public Set<Map<String, Object>> findPopularFields(@Param("year") Long year) {
-        Set<Map<String, Object>> res = new HashSet<>();
-        List<Object[]> list_author = authorCitationsDAO.getAuthornumByYear(year);
+    public List<Map<String, Object>> findPopularFields(@Param("year") Long year) {
+        List<Map<String, Object>> res = new LinkedList<>();
+        // year内的
+        //按照论文数量从高到低排序
         List<Object[]> list_paper = paperCitationsDAO.getPapernumByYear(year);
-        for (int i = 0; i < list_author.size(); i++) {
-            Map<String, Object> sub_res = new HashMap<>();
-            Object[] author = list_author.get(i);
-            sub_res.put("field", author[0].toString());
-            sub_res.put("authorNumber", 0);
-            sub_res.put("paperNumber", 0);
+
+        Map<String,Integer> mapForSort = new HashMap<>();
+        for(Object[] o : list_paper){
+            mapForSort.put(o[0].toString(),Integer.valueOf(o[1].toString()));
+        }
+        Map<String,Integer> mapSorted= MapSortUtil.sortByValueDesc(mapForSort);
+        for(String subject:mapSorted.keySet()){
+            Map<String,Object> sub_res = new HashMap<>();
+            List<Object> list_author = authorCitationsDAO.getAuthornumByYearSubject(year,subject);
+            int author_num = Integer.valueOf(list_author.get(0).toString());
+            sub_res.put("field",subject);
+            sub_res.put("authorNumber",author_num);
+            sub_res.put(("paperNumber"),mapSorted.get(subject));
             res.add(sub_res);
-        }
-        for (int i = 0; i < list_paper.size(); i++) {
-            Map<String, Object> sub_res = new HashMap<>();
-            Object[] paper = list_paper.get(i);
-            sub_res.put("field", paper[0].toString());
-            sub_res.put("authorNumber", 0);
-            sub_res.put("paperNumber", 0);
-            res.add(sub_res);
-        }
-        for (Object[] o : list_author) {
-            for (Map<String, Object> map : res) {
-                if (o[0].toString().equals(map.get("field"))) {
-                    map.put("authorNumber", Integer.valueOf(o[1].toString()));
-                    break;
-                }
-            }
-        }
-        for (Object[] o : list_paper) {
-            for (Map<String, Object> map : res) {
-                if (o[0].toString().equals(map.get("field"))) {
-                    map.put("paperNumber", Integer.valueOf(o[1].toString()));
-                    break;
-                }
-            }
         }
         return res;
     }
@@ -88,10 +74,15 @@ public class StreamingController {
     public List<Map<String, Object>> findPaperNumbers(@Param("year") Long year, @Param("field") String field) {
         List<Map<String, Object>> res = new LinkedList<>();
         List<Object[]> list_paper = paperCitationsDAO.getPapernumByYearField(year, field);
-        for (Object[] o : list_paper) {
+        Map<Integer,Integer> mapForSort = new HashMap<>();
+        for(Object[] o : list_paper){
+            mapForSort.put(Integer.valueOf(o[0].toString()),Integer.valueOf(o[1].toString()));
+        }
+        Map<Integer,Integer> mapSorted= MapSortUtil.sortByKeyAsc(mapForSort);
+        for (Integer sortedYear: mapSorted.keySet()) {
             Map<String, Object> sub_res = new HashMap<>();
-            sub_res.put("year", Integer.valueOf(o[0].toString()));
-            sub_res.put("paperNumber", Integer.valueOf(o[1].toString()));
+            sub_res.put("year", sortedYear);
+            sub_res.put("paperNumber",mapSorted.get(sortedYear));
             res.add(sub_res);
         }
         return res;
@@ -168,7 +159,7 @@ public class StreamingController {
         Calendar cal = Calendar.getInstance();
         int year_now = cal.get(Calendar.YEAR);
 
-        for (int i = year_now; i > year_now - year; i--) {
+        for (long i = year_now-year+1; i <= year_now ; i++) {
             for (int j = 1; j <= 12; j++) {//月份
                 List<SubjectPaperCount> subjectPaperCounts = subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
                 if (subjectPaperCounts.isEmpty()) {
@@ -195,9 +186,8 @@ public class StreamingController {
         return res;
     }
 
-    @ApiOperation(value = "", notes = "根据输⼊的年份数量，返回近x年来每⼀年的论文总数")
-    @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
-    @RequestMapping(value = "/AllPopularFieldRanking", method = RequestMethod.POST)
+    @ApiOperation(value = "", notes = "返回数据库中每⼀年的论文总数，会轮询调用这个方法，为了'启动云计算'的需求")
+    @RequestMapping(value = "/LoadedDataNumbers", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> findAllPopularFieldRanking(@Param("year") Long year) {
         Map<String, Object> res = new HashMap<>();
@@ -215,13 +205,13 @@ public class StreamingController {
                 }
                 String date = String.valueOf(i) + "-" + String.valueOf(j);
                 Map<String, Object> sub_res = new HashMap<>();
-                sub_res.put("date", date);
+                sub_res.put("date:", date);
                 List<Map<String, Object>> subFields = new LinkedList<>();
                 long count = 0;
                 for (SubjectPaperCount subjectPaperCount : subjectPaperCounts) {
                     count += subjectPaperCount.getPaperCount();
                 }
-                sub_res.put("count", count);
+                sub_res.put("count:", count);
                 rankings.add(sub_res);
             }
         }
@@ -229,7 +219,8 @@ public class StreamingController {
         return res;
     }
 
-    @RequestMapping(value = "/StartPaperCount")
+    @ApiOperation(value = "", notes = "启动云计算")
+    @RequestMapping(value = "/StartPaperCount", method = RequestMethod.POST)
     public String startStreamingService() {
         return streamService.startPaperCountStream();
     }

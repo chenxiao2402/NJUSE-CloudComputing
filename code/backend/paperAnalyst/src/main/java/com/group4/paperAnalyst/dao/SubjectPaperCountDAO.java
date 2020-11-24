@@ -21,6 +21,12 @@ public interface SubjectPaperCountDAO extends JpaRepository<SubjectPaperCount,In
     @Modifying
     //按照年月获取该时间最热门的领域
     @Query(value = "select * from subject_paper_count where year =:year and month = :month order by paper_count desc limit 10",nativeQuery = true)
-    List<SubjectPaperCount> getFieldTop10Bydate(@Param("year") Long year,@Param("month")Long month);
+    List<SubjectPaperCount> getFieldTop10Bydate(@Param("year") Long year, @Param("month") Long month);
+
+    @Transactional
+    @Modifying
+    @Query(value = "select subject,paper_count,author_count from subject_paper_count where subject = :subject and "
+            +"year >= Year(CURDATE())-:year",nativeQuery = true)
+    List<Object[]> getCountByYearSubject(@Param("year") Long year, @Param("subject") String subject);
 
 }
