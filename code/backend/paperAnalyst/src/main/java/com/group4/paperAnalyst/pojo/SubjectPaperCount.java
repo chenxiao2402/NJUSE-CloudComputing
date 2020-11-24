@@ -38,4 +38,12 @@ public class SubjectPaperCount {
   public void setPaperCount(long paperCount) {
     this.paperCount = paperCount;
   }
+
+  public SubjectPaperCount copy() {
+    SubjectPaperCount result = new SubjectPaperCount();
+    result.setId(this.getId());
+    result.setAuthorCount(this.getAuthorCount());
+    result.setPaperCount(this.getPaperCount());
+    return result;
+  }
 }
