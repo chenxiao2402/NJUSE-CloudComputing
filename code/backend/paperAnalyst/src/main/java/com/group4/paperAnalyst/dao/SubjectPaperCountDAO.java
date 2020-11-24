@@ -1,6 +1,7 @@
 package com.group4.paperAnalyst.dao;
 
 import com.group4.paperAnalyst.pojo.SubjectPaperCount;
+import com.group4.paperAnalyst.vo.AnnualFieldVO;
 import com.group4.paperAnalyst.vo.PopularFieldsVO;
 import com.group4.paperAnalyst.vo.YearPaperCount;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,6 +38,11 @@ public interface SubjectPaperCountDAO extends JpaRepository<SubjectPaperCount, I
     @Query("select new com.group4.paperAnalyst.vo.PopularFieldsVO(s.id.subject, sum(s.paperCount), sum(s.authorCount)) " +
             "from SubjectPaperCount s where s.id.year >= :year group by s.id.subject")
     List<PopularFieldsVO> getPopularFieldsInfoAfterYear(@Param("year") Long year);
+
+    @Query("select new com.group4.paperAnalyst.vo.AnnualFieldVO(s.id.year, s.id.subject, sum(s.paperCount)) " +
+            "from SubjectPaperCount s where s.id.year >= :year " +
+            "group by s.id.year, s.id.subject ")
+    List<AnnualFieldVO> getAnnualFieldVO(@Param("year") Long year);
 
     @Transactional
     @Modifying

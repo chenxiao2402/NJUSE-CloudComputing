@@ -5,10 +5,7 @@ import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 import com.group4.paperAnalyst.service.StreamService;
 import com.group4.paperAnalyst.util.MapSortUtil;
 import com.group4.paperAnalyst.util.MonthFieldsAccumulator;
-import com.group4.paperAnalyst.vo.PopularFieldRankingVO;
-import com.group4.paperAnalyst.vo.PopularFieldsVO;
-import com.group4.paperAnalyst.vo.YearPaperCount;
-import com.group4.paperAnalyst.vo.YearRankingVO;
+import com.group4.paperAnalyst.vo.*;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -119,22 +116,30 @@ public class StreamingController {
     @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
     @RequestMapping(value = "/PopularAnnualField", method = RequestMethod.POST)
     @ResponseBody
-    public List<Map<String, Object>> findPopularAnnualField(@Param("year") Long year) {
-        List<Map<String, Object>> res = new LinkedList<>();
-        Calendar cal = Calendar.getInstance();
-        int year_now = cal.get(Calendar.YEAR);
-        for (int i = year_now; i > year_now - year; i--) {
-            List<SubjectPaperCount> subjectPaperCounts = subjectPaperCountDAO.getPaperNumByYear(Long.valueOf(i));
-            if (subjectPaperCounts.isEmpty()) {
-                continue;
-            }
-            Map<String, Object> sub_res = new HashMap<>();
-            sub_res.put("year", i);
-            sub_res.put("field", subjectPaperCounts.get(0).getId().getSubject());
-            sub_res.put("count", subjectPaperCounts.get(0).getPaperCount());
-            res.add(sub_res);
-        }
-        return res;
+    public List<AnnualFieldVO> findPopularAnnualField(@Param("year") Long year) {
+        List<AnnualFieldVO> annualFieldVOS = subjectPaperCountDAO.getAnnualFieldVO(year);
+        Map<Long, List<AnnualFieldVO>> fieldsByYear = annualFieldVOS.stream()
+                .collect(Collectors.groupingBy(AnnualFieldVO::getYear));
+
+        return fieldsByYear.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(entry ->
+            entry.getValue().stream().max(Comparator.comparing(AnnualFieldVO::getCount))
+                    .orElseThrow(NoSuchElementException::new)
+        ).collect(Collectors.toList());
+//        List<Map<String, Object>> res = new LinkedList<>();
+//        Calendar cal = Calendar.getInstance();
+//        int year_now = cal.get(Calendar.YEAR);
+//        for (int i = year_now; i > year_now - year; i--) {
+//            List<SubjectPaperCount> subjectPaperCounts = subjectPaperCountDAO.getPaperNumByYear(Long.valueOf(i));
+//            if (subjectPaperCounts.isEmpty()) {
+//                continue;
+//            }
+//            Map<String, Object> sub_res = new HashMap<>();
+//            sub_res.put("year", i);
+//            sub_res.put("field", subjectPaperCounts.get(0).getId().getSubject());
+//            sub_res.put("count", subjectPaperCounts.get(0).getPaperCount());
+//            res.add(sub_res);
+//        }
+//        return res;
     }
 
     @ApiOperation(value = "", notes = "根据输⼊的年份数量，返回近x年来每⼀年的热⻔领域（按照⽂章数）和该领域的⽂章数")
