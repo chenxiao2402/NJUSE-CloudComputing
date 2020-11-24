@@ -177,7 +177,7 @@ public class StreamingController {
 
                 String date = String.valueOf(i) + "-" + String.valueOf(j);
                 Map<String, Object> sub_res = new HashMap<>();
-                sub_res.put("date:", date);
+                sub_res.put("date", date);
                 List<Map<String, Object>> subFields = new LinkedList<>();
                 for (SubjectPaperCount subjectPaperCount : subjectPaperCounts) {
                     fields.add(subjectPaperCount.getId().getSubject());
@@ -186,7 +186,7 @@ public class StreamingController {
                     subFieldsItem.put("paperNumber", subjectPaperCount.getPaperCount());
                     subFields.add(subFieldsItem);
                 }
-                sub_res.put("field", subFields);
+                sub_res.put("fields", subFields);
                 rankings.add(sub_res);
             }
         }
@@ -215,13 +215,13 @@ public class StreamingController {
                 }
                 String date = String.valueOf(i) + "-" + String.valueOf(j);
                 Map<String, Object> sub_res = new HashMap<>();
-                sub_res.put("date:", date);
+                sub_res.put("date", date);
                 List<Map<String, Object>> subFields = new LinkedList<>();
                 long count = 0;
                 for (SubjectPaperCount subjectPaperCount : subjectPaperCounts) {
                     count += subjectPaperCount.getPaperCount();
                 }
-                sub_res.put("count:", count);
+                sub_res.put("count", count);
                 rankings.add(sub_res);
             }
         }
@@ -229,7 +229,7 @@ public class StreamingController {
         return res;
     }
 
-    @RequestMapping(value = "/startPaperCount")
+    @RequestMapping(value = "/StartPaperCount")
     public String startStreamingService() {
         return streamService.startPaperCountStream();
     }

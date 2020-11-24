@@ -131,7 +131,6 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
             }
         }
 
-        console.log(graph);
         return {graph, categories};
     };
 
@@ -214,7 +213,8 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
             }
         }
         if (!this.props.visible) {
-            localStorage.clear();
+            localStorage.removeItem('dataLoaded');
+            localStorage.removeItem('field');
         }
     }
 

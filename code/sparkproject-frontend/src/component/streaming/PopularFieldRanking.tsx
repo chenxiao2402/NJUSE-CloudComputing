@@ -2,116 +2,72 @@ import React, { Component } from 'react';
 import ChartRace from './ChartRace';
 import echarts from '../../utilities/echarts';
 import {Col, Row, InputNumber, Button, Space} from 'antd';
-import { SearchOutlined, CaretRightOutlined, UploadOutlined, LoadingOutlined} from '@ant-design/icons';
+import { SearchOutlined, CaretRightOutlined } from '@ant-design/icons';
 import {getColorDict} from '../../utilities/color';
+import {URL, sendRequest} from "../../utilities/axios";
 
 interface IState {
-    originalData: Array<any>,
-    rankData: Array<any>,
+    dynamicRankingData: Array<any>,
+    oneMonthData: Array<any>,
     title: string,
     index: number,
     year: number,
+    selectedYear: number,
     colorDict: {},
-    playing: boolean,
+    playButtonDisabled: boolean,
     playingInterval: any,
-    loadingStream: boolean
-    loadingStreamInterval: any,
-    dataNumber: number
+    dataNumber: number,
+    annualData: any
 }
 
 class PopularFieldRanking extends Component<any, IState>{
     constructor(props: any){
         super(props);
         this.state = {
-            originalData: [],
-            rankData: [],
+            dynamicRankingData: [],
+            oneMonthData: [],
             title: '',
             index: 0,
             year: 2016,
+            selectedYear: 2016,
             colorDict: {},
-            playing: false,
+            playButtonDisabled: true,
             playingInterval: null,
-            loadingStream: false,
-            loadingStreamInterval: null,
-            dataNumber: 0
+            dataNumber: 0,
+            annualData: []
         };
     }
 
-    getRandomInt = (min: number, max: number) => {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-
-    fakeData = () => {
-        // get data of year
-        const year1 = this.state.year;
-        const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-        const fields = ['ML', 'DL', 'System', 'Database', 'Security', 'Static Analysis', 'Compiling', 'Network', 'HCI', 'CV'];
-        const numberDict = {};
-        // const colorDict = getColorDict(new Set(fields));
-        let data = [];
-        for (let year = 2020 - year1 + 1; year <= 2020; year ++) {
-            for (let month of months) {
-                for (let field of fields) {
-                    if (numberDict[field] === undefined) {
-                        numberDict[field] = this.getRandomInt(10, 90);
-                    } else {
-                        numberDict[field] += this.getRandomInt(10, 90);
-                    }
-                }
-                var items = Object.keys(numberDict).map((key) => {
-                    return {
-                        name: key,
-                        paperNumber: numberDict[key]
-                    };
-                });
-
-                items.sort((first, second) => {
-                    return second.paperNumber - first.paperNumber;
-                });
-
-                const mostEight = items.slice(0, 10);
-
-                data.push({
-                    date: year.toString() + '-' + month,
-                    fields: mostEight
-                })
-            }
-        }
-        return data;
-    };
-
     yearSelected = () => {
         clearInterval(this.state.playingInterval);
-        clearInterval(this.state.loadingStreamInterval);
+        this.setState({selectedYear: this.state.year});
 
-        this.setState({playing: false, loadingStream: false});
-
-        const originalData = this.fakeData();
-        let nameSet = new Set();
-        originalData.forEach((originalData) => {
-            originalData.fields.forEach((fieldInfo) => {
-                nameSet.add(fieldInfo.name)
-            })
+        sendRequest(URL.POPULAR_FIELD_RANKING, {year: 2020 - this.state.selectedYear}, (originalData) => {
+            let nameSet = new Set();
+            originalData.fields.forEach((field) => { nameSet.add(field); });
+            const colorDict = getColorDict(nameSet);
+            this.setState({
+                dynamicRankingData: originalData.rankings,
+                index: 0,
+                colorDict: colorDict,
+                playButtonDisabled: false
+            }, this.setRankingData);
         });
-        const colorDict = getColorDict(nameSet);
-        this.setState({
-            originalData: originalData,
-            index: 0,
-            colorDict: colorDict
-        }, () => {
-            this.setRankingData();
+
+        sendRequest(URL.POPULAR_ANNUAL_FIELD, {year: 2020 - this.state.selectedYear}, (annualData) => {
+            this.setState({
+                annualData: annualData
+            });
         });
     };
 
     startPlay = () => {
-        this.setState({index: 0, playing: true});
+        this.setState({index: 0, playButtonDisabled: true});
         const playingInterval = setInterval(() => {
-            if (this.state.index >= this.state.originalData.length) {
+            if (this.state.index >= this.state.dynamicRankingData.length) {
                 clearInterval();
                 this.setState({
-                    playing: false,
+                    playButtonDisabled: false,
                     playingInterval: null
                 });
             } else {
@@ -122,9 +78,9 @@ class PopularFieldRanking extends Component<any, IState>{
     };
 
     setRankingData = () => {
-        const originalData = this.state.originalData[this.state.index];
-        const title = originalData.date;
-        const rankData = originalData.fields.map((fieldInfo) => {
+        const oneMonthDataWithTitle = this.state.dynamicRankingData[this.state.index];
+        const title = oneMonthDataWithTitle.date;
+        const oneMonthData = oneMonthDataWithTitle.fields.map((fieldInfo) => {
             return {
                 id: fieldInfo.name,
                 title: fieldInfo.name,
@@ -133,7 +89,7 @@ class PopularFieldRanking extends Component<any, IState>{
             }
         });
         this.setState({
-            rankData: rankData,
+            oneMonthData: oneMonthData,
             title: title
         });
     };
@@ -142,18 +98,6 @@ class PopularFieldRanking extends Component<any, IState>{
         this.setRankingData();
         this.setState({
             index: this.state.index + 1
-        });
-    };
-
-    loadStream = () => {
-        const loadingStreamInterval = setInterval(() => {
-            this.setState({
-                dataNumber: this.state.dataNumber + 500
-            })
-        }, 500);
-        this.setState({
-            loadingStream: true,
-            loadingStreamInterval: loadingStreamInterval
         });
     };
 
@@ -171,36 +115,21 @@ class PopularFieldRanking extends Component<any, IState>{
             },
             xAxis: {
                 type: 'category',
-                data: ['2016', '2017', '2018', '2019', '2020']
+                data: this.state.annualData.map((e) => e.year),
             },
             yAxis: {
                 type: 'value'
             },
             series: [{
-                data: [2312, 2213, 1921, 2523, 2678],
+                data: this.state.annualData.map((e) => e.count),
                 type: 'bar'
             }],
-
             label:{
                 show: true,
                 position: 'top',
                 formatter: (param) => {
-                    if(param.dataIndex === 0){
-                        return 'Machine Learning';
-                    }
-                    if(param.dataIndex === 1){
-                        return 'Computer Vision';
-                    }
-                    if(param.dataIndex === 2){
-                        return 'Security';
-                    }
-                    if(param.dataIndex === 3){
-                        return 'HCI';
-                    }
-                    if(param.dataIndex === 4){
-                        return 'Network';
-                    }
-                },
+                    return this.state.annualData[param.dataIndex].field;
+                }
             }
         });
         window.onresize = () => {
@@ -220,16 +149,14 @@ class PopularFieldRanking extends Component<any, IState>{
                     <Col span={13}>
                         <div style={{textAlign: 'center'}} >
                             <Space>
-                                <span style={{fontSize: 20, fontWeight: 'bold', marginRight: 16}}>各领域论文数量 ({this.state.year}-2020)</span>
-                                {this.state.loadingStream ? <LoadingOutlined /> : <Button shape='circle' icon={<UploadOutlined/>} onClick={this.loadStream} />}
-                                <span style={{width: 180, display: 'inline-block', textAlign: 'left'}}>流读取论文数：{this.state.dataNumber}</span>
+                                <span style={{fontSize: 20, fontWeight: 'bold', marginRight: 16}}>各领域论文数量 ({this.state.selectedYear}-2020)</span>
                                 <Button shape='circle' icon={<CaretRightOutlined/>} onClick={this.startPlay}
-                                        disabled={this.state.playing} />
+                                        disabled={this.state.playButtonDisabled} />
                                 <span>{this.state.title}</span>
                             </Space>
                         </div>
                         <ChartRace
-                            data={this.state.rankData}
+                            data={this.state.oneMonthData}
                             backgroundColor='#fff'
                             width={window.innerWidth * (13 / 24)}
                             padding={8}

@@ -14,7 +14,7 @@ interface IState {
     title: string,
     visible1: boolean,
     visible2: boolean,
-    year: number,
+    year: number
 }
 
 class PopularFields extends React.Component<any, IState> {
@@ -34,7 +34,6 @@ class PopularFields extends React.Component<any, IState> {
             return
         }
         sendRequest(URL.PAPER_NUMBERS, {year: this.state.year, field: field}, (data) => {
-            console.log(data);
             const paperNumberData = data.map((e) => {return {year: e.year, paperNumber: e.paperNumber}});
             this.setState({paperNumberData: paperNumberData, visible1: true})
         })
