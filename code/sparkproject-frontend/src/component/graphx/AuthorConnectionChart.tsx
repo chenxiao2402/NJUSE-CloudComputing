@@ -4,7 +4,7 @@ import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import CollaboratorModal from './CollaboratorModal';
 import {URL, sendRequest} from "../../utilities/axios";
 import echarts from "../../utilities/echarts";
-import {COLORS} from "../../utilities/color";
+// import {COLORS} from "../../utilities/color";
 const { Option } = Select;
 
 const defaultProps = {
@@ -141,7 +141,7 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
                 const myChart = echarts.init(document.getElementById('authorConnectionChart'));
 
                 myChart.setOption( {
-                    color: COLORS,
+                    // color: COLORS,
                     title: {
                         text: `${this.props.field}领域合作关系图（2016-2020）`,
                         top: 'bottom',
@@ -155,14 +155,14 @@ export default class RelatedFieldsChart extends Component<Props, IState> {
                         containLabel: true
                     },
                     tooltip: {},
-                    // legend: [{
-                    //     // selectedMode: 'single',
-                    //     data: data.categories,
-                    //     orient: 'vertical',
-                    //     left: 'right',
-                    //     top: 'center',
-                    //     // formatter: ' '
-                    // }],
+                    legend: [{
+                        // selectedMode: 'single',
+                        data: data.categories,
+                        orient: 'vertical',
+                        left: 'right',
+                        top: 'center',
+                        // formatter: ' '
+                    }],
                     series : [
                         {
                             name: '合作者数量',

@@ -94,19 +94,19 @@ class PopularFields extends React.Component<any, IState> {
                 trigger: 'item',
                 formatter: '{a} <br/>{b} : {c} ({d}%)'
             },
-            legend: {
-                orient: 'vertical',
-                left: 'left',
-                data: this.state.fieldData.map((e) => {
-                    return e.field
-                }),
-            },
+            // legend: {
+            //     orient: 'vertical',
+            //     left: 'left',
+            //     data: this.state.fieldData.map((e) => {
+            //         return e.field
+            //     }),
+            // },
             series: [
                 {
                     name: '论文发表数',
                     type: 'pie',
                     radius: '50%',
-                    center: ['60%', '50%'],
+                    center: ['50%', '50%'],
                     data: this.state.fieldData.map((e) => {
                         return {
                             name: e.field,

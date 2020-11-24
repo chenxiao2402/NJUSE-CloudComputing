@@ -26,7 +26,7 @@ const URL = {
     AUTHOR_CONNECTIONS: 'AuthorConnections',
     COLLABORATORS: 'Collaborators',
     START_PAPER_COUNT: 'StartPaperCount',
-    ALL_POPULAR_FIELD_RANKING: 'AllPopularFieldRanking'
+    YEAR_PAPER_COUNT: 'YearPaperCount'
 };
 
 const sendRequest = (url, params: any, callback: Function) => {
