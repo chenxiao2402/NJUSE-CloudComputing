@@ -16,7 +16,7 @@ public interface PaperCitationsDAO extends JpaRepository<PaperCitations,Integer>
     //近几年各领域文章数
     @Query(value = "select subject,count(title) as num from paper_citations where year >="+
             ":year group by `subject` ORDER BY num desc limit 20",nativeQuery = true)
-    List<Object[]> getPapernumByYear(@Param("year") Long year);
+    List<Object[]> getPaperNumByYear(@Param("year") Long year);
 
     @Transactional
     @Modifying
