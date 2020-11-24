@@ -2,6 +2,8 @@ package com.group4.paperAnalyst.dao;
 
 import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 import com.group4.paperAnalyst.vo.YearPaperCount;
+import com.group4.paperAnalyst.vo.YearMonthSubjectCount;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,6 +30,10 @@ public interface SubjectPaperCountDAO extends JpaRepository<SubjectPaperCount, I
     @Query(value = "select new com.group4.paperAnalyst.vo.YearPaperCount(s.id.year, sum(s.paperCount)) " +
             "from SubjectPaperCount s group by s.id.year")
     List<YearPaperCount> getYearPaperCount();
+
+    @Query("select s " +
+            "from SubjectPaperCount s where s.id.year = :year order by s.id.month, s.paperCount desc")
+    List<SubjectPaperCount> getPopularFieldRankingByYear(@Param("year") Long year);
 
     @Transactional
     @Modifying

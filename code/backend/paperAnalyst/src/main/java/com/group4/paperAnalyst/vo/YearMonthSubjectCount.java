@@ -5,13 +5,30 @@ package com.group4.paperAnalyst.vo;
  * Date: 2020/11/24
  * Description:
  */
-public class YearSubjectCount {
+public class YearMonthSubjectCount {
 
     private Long year;
+
+    private Long month;
 
     private String subject;
 
     private Long count;
+
+    public YearMonthSubjectCount(Long year, Long month, String subject, Long count) {
+        this.year = year;
+        this.month = month;
+        this.subject = subject;
+        this.count = count;
+    }
+
+    public Long getMonth() {
+        return month;
+    }
+
+    public void setMonth(Long month) {
+        this.month = month;
+    }
 
     public Long getYear() {
         return year;
@@ -37,9 +54,11 @@ public class YearSubjectCount {
         this.count = count;
     }
 
-    public YearSubjectCount(Long year, String subject, Long count) {
+    public YearMonthSubjectCount(Long year, String subject, Long count) {
         this.year = year;
         this.subject = subject;
         this.count = count;
     }
+
+
 }

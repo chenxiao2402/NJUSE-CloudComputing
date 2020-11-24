@@ -4,7 +4,9 @@ import com.group4.paperAnalyst.dao.*;
 import com.group4.paperAnalyst.pojo.SubjectPaperCount;
 import com.group4.paperAnalyst.service.StreamService;
 import com.group4.paperAnalyst.util.MapSortUtil;
+import com.group4.paperAnalyst.vo.PopularFieldRankingVO;
 import com.group4.paperAnalyst.vo.YearPaperCount;
+import com.group4.paperAnalyst.vo.YearRankingVO;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -48,18 +51,18 @@ public class StreamingController {
         //按照论文数量从高到低排序
         List<Object[]> list_paper = paperCitationsDAO.getPapernumByYear(year);
 
-        Map<String,Integer> mapForSort = new HashMap<>();
-        for(Object[] o : list_paper){
-            mapForSort.put(o[0].toString(),Integer.valueOf(o[1].toString()));
+        Map<String, Integer> mapForSort = new HashMap<>();
+        for (Object[] o : list_paper) {
+            mapForSort.put(o[0].toString(), Integer.valueOf(o[1].toString()));
         }
-        Map<String,Integer> mapSorted= MapSortUtil.sortByValueDesc(mapForSort);
-        for(String subject:mapSorted.keySet()){
-            Map<String,Object> sub_res = new HashMap<>();
-            List<Object> list_author = authorCitationsDAO.getAuthornumByYearSubject(year,subject);
+        Map<String, Integer> mapSorted = MapSortUtil.sortByValueDesc(mapForSort);
+        for (String subject : mapSorted.keySet()) {
+            Map<String, Object> sub_res = new HashMap<>();
+            List<Object> list_author = authorCitationsDAO.getAuthornumByYearSubject(year, subject);
             int author_num = Integer.valueOf(list_author.get(0).toString());
-            sub_res.put("field",subject);
-            sub_res.put("authorNumber",author_num);
-            sub_res.put(("paperNumber"),mapSorted.get(subject));
+            sub_res.put("field", subject);
+            sub_res.put("authorNumber", author_num);
+            sub_res.put(("paperNumber"), mapSorted.get(subject));
             res.add(sub_res);
         }
         return res;
@@ -74,15 +77,15 @@ public class StreamingController {
     public List<Map<String, Object>> findPaperNumbers(@Param("year") Long year, @Param("field") String field) {
         List<Map<String, Object>> res = new LinkedList<>();
         List<Object[]> list_paper = paperCitationsDAO.getPapernumByYearField(year, field);
-        Map<Integer,Integer> mapForSort = new HashMap<>();
-        for(Object[] o : list_paper){
-            mapForSort.put(Integer.valueOf(o[0].toString()),Integer.valueOf(o[1].toString()));
+        Map<Integer, Integer> mapForSort = new HashMap<>();
+        for (Object[] o : list_paper) {
+            mapForSort.put(Integer.valueOf(o[0].toString()), Integer.valueOf(o[1].toString()));
         }
-        Map<Integer,Integer> mapSorted= MapSortUtil.sortByKeyAsc(mapForSort);
-        for (Integer sortedYear: mapSorted.keySet()) {
+        Map<Integer, Integer> mapSorted = MapSortUtil.sortByKeyAsc(mapForSort);
+        for (Integer sortedYear : mapSorted.keySet()) {
             Map<String, Object> sub_res = new HashMap<>();
             sub_res.put("year", sortedYear);
-            sub_res.put("paperNumber",mapSorted.get(sortedYear));
+            sub_res.put("paperNumber", mapSorted.get(sortedYear));
             res.add(sub_res);
         }
         return res;
@@ -151,39 +154,69 @@ public class StreamingController {
     @ApiImplicitParam(name = "year", value = "年份", paramType = "query", dataType = "Long")
     @RequestMapping(value = "/PopularFieldRanking", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> findPopularFieldRanking(@Param("year") Long year) {
-        Map<String, Object> res = new HashMap<>();
-        Set<String> fields = new HashSet<>();
-        List<Map<String, Object>> rankings = new LinkedList<>();
+    public PopularFieldRankingVO findPopularFieldRanking(@Param("year") Long year) {
 
         Calendar cal = Calendar.getInstance();
-        int year_now = cal.get(Calendar.YEAR);
+        int yearNow = cal.get(Calendar.YEAR);
 
-        for (long i = year_now-year+1; i <= year_now ; i++) {
-            for (int j = 1; j <= 12; j++) {//月份
-                List<SubjectPaperCount> subjectPaperCounts = subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
-                if (subjectPaperCounts.isEmpty()) {
-                    continue;
-                }
+        PopularFieldRankingVO result = new PopularFieldRankingVO();
+        Set<String> appearedFields = new HashSet<>();
 
-                String date = String.valueOf(i) + "-" + String.valueOf(j);
-                Map<String, Object> sub_res = new HashMap<>();
-                sub_res.put("date", date);
-                List<Map<String, Object>> subFields = new LinkedList<>();
-                for (SubjectPaperCount subjectPaperCount : subjectPaperCounts) {
-                    fields.add(subjectPaperCount.getId().getSubject());
-                    Map<String, Object> subFieldsItem = new HashMap<>();
-                    subFieldsItem.put("name", subjectPaperCount.getId().getSubject());
-                    subFieldsItem.put("paperNumber", subjectPaperCount.getPaperCount());
-                    subFields.add(subFieldsItem);
-                }
-                sub_res.put("fields", subFields);
-                rankings.add(sub_res);
-            }
+        for (long i = year; i <= yearNow; i++) {
+            List<SubjectPaperCount> yearRankings =
+                    subjectPaperCountDAO.getPopularFieldRankingByYear(i);
+            Map<Long, List<SubjectPaperCount>> monthFields = yearRankings.stream()
+                    .collect(Collectors.groupingBy(SubjectPaperCount::getMonth));
+
+            long currentYear = i;
+            monthFields.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> {
+                String date = dateString(currentYear, entry.getKey());
+                YearRankingVO yearRankingVO = new YearRankingVO(date);
+
+                List<YearRankingVO.FieldPaperCount> fields =  entry.getValue().stream().limit(10)
+                        .map(s -> {
+                            appearedFields.add(s.getId().getSubject());
+                            return new YearRankingVO.FieldPaperCount(s.getId().getSubject(), s.getPaperCount());
+                        })
+                        .collect(Collectors.toList());
+                yearRankingVO.setFields(fields);
+                result.getRankings().add(yearRankingVO);
+            });
         }
-        res.put("fields", fields);
-        res.put("rankings", rankings);
-        return res;
+        result.setFields(new ArrayList<>(appearedFields));
+
+        return result;
+//        Map<String, Object> res = new HashMap<>();
+//        Set<String> fields = new HashSet<>();
+//        List<Map<String, Object>> rankings = new LinkedList<>();
+//
+//
+//        for (long i = yearNow - year + 1; i <= yearNow; i++) {
+//            for (int j = 1; j <= 12; j++) {//月份
+//                List<SubjectPaperCount> subjectPaperCounts =
+//                        subjectPaperCountDAO.getFieldTop10Bydate(Long.valueOf(i), Long.valueOf(j));
+//                if (subjectPaperCounts.isEmpty()) {
+//                    continue;
+//                }
+//
+//                String date = String.valueOf(i) + "-" + String.valueOf(j);
+//                Map<String, Object> sub_res = new HashMap<>();
+//                sub_res.put("date", date);
+//                List<Map<String, Object>> subFields = new LinkedList<>();
+//                for (SubjectPaperCount subjectPaperCount : subjectPaperCounts) {
+//                    fields.add(subjectPaperCount.getId().getSubject());
+//                    Map<String, Object> subFieldsItem = new HashMap<>();
+//                    subFieldsItem.put("name", subjectPaperCount.getId().getSubject());
+//                    subFieldsItem.put("paperNumber", subjectPaperCount.getPaperCount());
+//                    subFields.add(subFieldsItem);
+//                }
+//                sub_res.put("fields", subFields);
+//                rankings.add(sub_res);
+//            }
+//        }
+//        res.put("fields", fields);
+//        res.put("rankings", rankings);
+//        return res;
     }
 
     @RequestMapping("/YearPaperCount")
@@ -194,5 +227,13 @@ public class StreamingController {
     @RequestMapping(value = "/StartPaperCount")
     public String startStreamingService() {
         return streamService.startPaperCountStream();
+    }
+
+    private String dateString(Long year, Long month) {
+        if (month <= 10) {
+            return year.toString() + "-0" + month.toString();
+        } else {
+            return year.toString() + "-" + month.toString();
+        }
     }
 }
