@@ -22,7 +22,7 @@ public interface AuthorConnectionsAuthorDAO extends JpaRepository<AuthorConnecti
     @Transactional
     @Modifying
     //
-    @Query(value = "select * from author_connections_author where start_year >="+
+    @Query(value = "select * from author_connections_author where start_year ="+
             ":year and subject = :field ",nativeQuery = true)
     List<AuthorConnectionsAuthor> getAllByYearField(@Param("year") Long year,@Param("field") String field);
 

@@ -15,7 +15,7 @@ public interface RelativeSubjectsDAO extends JpaRepository<RelativeSubjects,Inte
     @Transactional
     @Modifying
     //选择近几年交叉领域前十名
-    @Query(value = "select * from relative_subjects  where start_year >="+
+    @Query(value = "select * from relative_subjects  where start_year ="+
             ":year",nativeQuery = true)
     List<RelativeSubjects> getRelatedFields(@Param("year") Long year);
 }

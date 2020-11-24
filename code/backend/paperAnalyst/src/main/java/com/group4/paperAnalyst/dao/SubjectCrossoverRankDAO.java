@@ -16,7 +16,7 @@ public interface SubjectCrossoverRankDAO extends JpaRepository<SubjectCrossoverR
     @Transactional
     @Modifying
     //选择近几年交叉领域前十名
-    @Query(value = "select * from subject_crossover_rank  where start_year >= "+
+    @Query(value = "select * from subject_crossover_rank  where start_year = "+
             ":year order by crossover_rank desc limit 20",nativeQuery = true)
     List<SubjectCrossoverRank> getRelatedFields(@Param("year") Long year);
 }

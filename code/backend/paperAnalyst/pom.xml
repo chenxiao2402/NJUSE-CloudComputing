@@ -103,6 +103,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <start-class>com.group4.paperAnalyst.Application</start-class>
     </properties>
 
 
