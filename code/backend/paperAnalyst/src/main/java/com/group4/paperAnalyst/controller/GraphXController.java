@@ -116,14 +116,14 @@ public class GraphXController {
         Map<String,Object> res = new HashMap<>();
         List<Object> links = new LinkedList();
         List<Object> nodes = new LinkedList();
-        Set<Long> categories = new HashSet<>();
+        Set<String> categories = new HashSet<>();
         List<Collaborations> list_collaboration= collaborationDAO.getRelatedFields(year, field);
         List<AuthorConnectionsAuthor> list_author = authorConnectionsAuthorDAO.getAllByYearField(year, field);
         //先找link，要存入每个作者的合作者有多少，遍历一下
         //每个作者的合作者数
         Map<Long,Integer> collaborators = new HashMap<>();
         for(Collaborations collaboration:list_collaboration) {
-            Map<String, Long> res_link = new HashMap<>();
+            Map<String, String> res_link = new HashMap<>();
             if(collaboration.toString()==""){
                 continue;
             }
@@ -147,19 +147,19 @@ public class GraphXController {
                 subject_source = subject_target;
                 subject_target = temp;
             }
-            res_link.put("source", subject_source);
-            res_link.put("target", subject_target);
+            res_link.put("source", String.valueOf(subject_source));
+            res_link.put("target", String.valueOf(subject_target));
             links.add(res_link);
         }
         //再添加node
         for(AuthorConnectionsAuthor authorConnectionsAuthor:list_author){
             Map<String, Object> res_node= new HashMap<>();
-            res_node.put("category",authorConnectionsAuthor.getAuthorCategory());
-            res_node.put("id",authorConnectionsAuthor.getId().getAuthorId());
-            res_node.put("name",authorConnectionsAuthor.getAuthorName());
-            res_node.put("collaborators",collaborators.get(authorConnectionsAuthor.getId().getAuthorId()));
+            res_node.put("category", String.valueOf(authorConnectionsAuthor.getAuthorCategory()));
+            res_node.put("id", String.valueOf(authorConnectionsAuthor.getId().getAuthorId()));
+            res_node.put("name", authorConnectionsAuthor.getAuthorName());
+            res_node.put("collaborators", collaborators.get(authorConnectionsAuthor.getId().getAuthorId()));
             nodes.add(res_node);
-            categories.add(authorConnectionsAuthor.getAuthorCategory());
+            categories.add(String.valueOf(authorConnectionsAuthor.getAuthorCategory()));
         }
         res.put("nodes", nodes);
         res.put("links", links);
